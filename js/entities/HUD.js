@@ -29,15 +29,21 @@ game.HUD.Container = me.Container.extend({
 /**
  * a basic HUD item to display score
  */
-game.HUD.ScoreItem = me.Renderable.extend({
+game.HUD.ScoreItem = me.Renderable.extend( {
     /**
      * constructor
      */
-    init: function(x, y) {
-
+    init : function (x, y) {
         // call the parent constructor
         // (size does not matter here)
         this._super(me.Renderable, 'init', [x, y, 10, 10]);
+
+        // create the font object
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+
+        // font alignment to right, bottom
+        this.font.textAlign = "right";
+        this.font.textBaseline = "bottom";
 
         // local copy of the global score
         this.score = -1;
@@ -46,8 +52,8 @@ game.HUD.ScoreItem = me.Renderable.extend({
     /**
      * update function
      */
-    update : function () {
-        // we don't do anything fancy here, so just
+    update : function (dt) {
+        // we don't draw anything fancy here, so just
         // return true if the score has been updated
         if (this.score !== game.data.score) {
             this.score = game.data.score;
@@ -59,8 +65,8 @@ game.HUD.ScoreItem = me.Renderable.extend({
     /**
      * draw the score
      */
-    draw : function (context) {
-        // draw it baby !
+    draw : function (renderer) {
+        // this.pos.x, this.pos.y are the relative position from the screen right bottom
+        this.font.draw (renderer, game.data.score, me.game.viewport.width + this.pos.x, me.game.viewport.height + this.pos.y);
     }
-
 });

@@ -8,14 +8,19 @@ game.PlayScreen = me.ScreenObject.extend({
         me.levelDirector.loadLevel("area01");
 
         // play the audio track
-        me.audio.playTrack("dst-inertexponent");
+        // me.audio.playTrack("dst-inertexponent");
 
         // reset the score
         game.data.score = 0;
 
         // add our HUD to the game world
-        this.HUD = new game.HUD.Container();
-        me.game.world.addChild(this.HUD);
+        // this.HUD = new game.HUD.Container();
+        // me.game.world.addChild(this.HUD);
+
+
+        me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2));
+
+
     },
 
     /**
@@ -23,7 +28,7 @@ game.PlayScreen = me.ScreenObject.extend({
      */
     onDestroyEvent : function () {
         // remove the HUD from the game world
-        me.game.world.removeChild(this.HUD);
+        me.game.world.removeChild(this.Tank);
         // stop the current audio track
         me.audio.stopTrack();
     }

@@ -10,7 +10,7 @@ var game = {
     // Run on page load.
     onload : function () {
         // Initialize the video.
-        if (!me.video.init(640, 480, {wrapper : "screen", scale : "auto", scaleMethod : "flex-width"})) {
+        if (!me.video.init(640, 480, {wrapper : "screen", scale : "auto", scaleMethod : "flex"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -24,8 +24,26 @@ var game = {
 
     // Run on game resources loaded.
     loaded : function () {
+
+        me.pool.register("TankContainer", game.Tank.TankContainer);
+        me.pool.register("CoinEntity", game.CoinEntity);
+        // me.pool.register("EnemyEntity", game.EnemyEntity);
+
+        // enable the keyboard
+        me.input.bindKey(me.input.KEY.LEFT, "left");
+        me.input.bindKey(me.input.KEY.RIGHT, "right");
+        me.input.bindKey(me.input.KEY.UP, "up");
+        me.input.bindKey(me.input.KEY.DOWN, "down");
+
+        me.input.bindKey(me.input.KEY.Z, "z");
+        me.input.bindKey(me.input.KEY.X, "x");
+
+        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
+
+
+
         // set the "Play/Ingame" Screen Object
-        me.state.set(me.state.MENU, new game.TitleScreen());
+        // me.state.set(me.state.MENU, new game.TitleScreen());
 
         // set the "Play/Ingame" Screen Object
         me.state.set(me.state.PLAY, new game.PlayScreen());
@@ -33,17 +51,7 @@ var game = {
         // set a global fading transition for the screen
         me.state.transition("fade", "#FFFFFF", 250);
 
-        // register our player entity in the object pool
-        me.pool.register("mainPlayer", game.PlayerEntity);
-        me.pool.register("CoinEntity", game.CoinEntity);
-        me.pool.register("EnemyEntity", game.EnemyEntity);
-
-        // enable the keyboard
-        me.input.bindKey(me.input.KEY.LEFT, "left");
-        me.input.bindKey(me.input.KEY.RIGHT, "right");
-        me.input.bindKey(me.input.KEY.SPACE, "jump", true);
-
         // display the menu title
-        me.state.change(me.state.MENU);
+        me.state.change(me.state.PLAY);
     }
 };

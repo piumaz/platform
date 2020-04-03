@@ -98,6 +98,7 @@ module.exports = function(grunt) {
     connect: {
       server: {
         options: {
+          host: '0.0.0.0',
           port: 8000,
           keepalive: false
         }
@@ -144,6 +145,12 @@ module.exports = function(grunt) {
         },{
           src: ['data/map/**/*.tsx'],
           type: 'tsx'
+        }, {
+          src: ['data/fnt/*.fnt'],
+          type: 'binary'
+        },{
+          src: ['data/fnt/*.png'],
+          type: 'image'
         }]
       }
     },

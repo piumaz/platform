@@ -18,9 +18,17 @@ game.Tank.TankContainer = me.Container.extend({
         };
         this.speedx = 0;
         this.speedy = 0;
-
         this.angle = 0;
         this.prevDegrees = 0;
+
+        this.centerGunPointer = {
+            x: 0,
+            y: 0
+        };
+        this.angleGun = 0;
+        this.prevGunDegrees = 0;
+
+
 
         this.anchorPoint.x = 0;
         this.anchorPoint.y = 0;
@@ -75,38 +83,98 @@ game.Tank.TankContainer = me.Container.extend({
 
         this.updateChildBounds();
 
-        me.input.registerPointerEvent("pointerdown", me.game.viewport, function (event) {
-            me.event.publish("pointerdown", [ event ]);
-        });
 
-        me.input.registerPointerEvent("pointermove", me.game.viewport, function (event) {
-            me.event.publish("pointermove", [ event ]);
-        });
 
-        me.input.registerPointerEvent("pointerleave", me.game.viewport, function (event) {
-            me.event.publish("pointerleave", [ event ]);
-        });
+        const HUD = me.game.world.getChildByName('HUD')[0];
 
-        this.pointerDown = me.event.subscribe("pointerdown", (e) => {
+        const joystickLeft = HUD.getChildByName('JoystickLeft')[0];
+        const joystickRight = HUD.getChildByName('JoystickRight')[0];
 
-            this.start(e);
+        me.input.registerPointerEvent('pointerdown', joystickLeft, this.start.bind(this));
+        me.input.registerPointerEvent('pointermove', joystickLeft, this.move.bind(this));
+        me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
 
-        });
+        me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this));
+        me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
 
-        this.pointerMove = me.event.subscribe("pointermove", (e) => {
+    },
 
-            this.move(e);
+    startGun: function (e) {
 
-        });
+        //console.log(e);
+        //console.log(joystickRight);
 
-        this.pointerLeave = me.event.subscribe("pointerleave", (e) => {
+        // this.centerGunPointer = {
+        //     x: joystickRight.pos.x + joystickRight.width / 2,
+        //     y: joystickRight.pos.y + joystickRight.height / 2,
+        // };
 
-            this.stop(e);
+        this.prevPosGun = e.pos;
 
-        });
+        this.centerGunPointer = {
+            x: e.pos.x,
+            y: e.pos.y
+        };
+
+
+    },
+
+    rotateGun: function (e) {
+
+        var position = e.pos;
+        var center = this.centerGunPointer;
+
+        // angle in radians
+        var radians = Math.atan2(position.y - center.y, position.x - center.x);
+
+        //degrees = (degrees) * (Math.PI / 180);
+
+        //this.prevGunDegrees = degrees;
+        //this.pos.x += (this.speedx * Math.sin(this.angle));
+        //this.pos.y -= (this.speedy * Math.cos(this.angle));
+
+
+        //console.log(degrees - this.prevGunDegrees);
+
+
+        const gun = this.getChildByName('GunEntity')[0];
+        if(radians > this.prevGunDegrees) {
+            radians = (radians - this.prevGunDegrees);
+        }
+        gun.centerRotate(radians);
+        this.prevGunDegrees = radians;
+        // if (degrees > this.prevGunDegrees) {
+        //     gun.centerRotate(1 * (degrees - this.prevDegrees) * Math.PI / 180);
+        // } else {
+        //     gun.centerRotate(-1 * (degrees - this.prevDegrees) * Math.PI / 180);
+        // }
+        // if (degrees > this.prevGunDegrees && (position.y > center.y)) {
+        //     moveAngle = -1;
+        // }
+
+        /*
+        if (position.x < center.x ) {
+            moveAngle = 1;
+        }
+        if (position.x > center.x ) {
+            moveAngle = -1;
+        }*/
+
+
+        //degrees = moveAngle * Math.PI / 180;
+
+        //degrees = (degrees - this.prevDegrees);
+        //console.log('degree', (degrees - this.prevDegrees));
+
+
+        this.prevPosGun = e.pos;
+        //this.prevGunDegrees = degrees;
+
+
     },
 
     start: function (e) {
+
         this.centerPointer = {
             x: e.pos.x,
             y: e.pos.y
@@ -123,14 +191,14 @@ game.Tank.TankContainer = me.Container.extend({
 
     move: function (e) {
 
-        let position = e.pos;
-        let center = this.centerPointer;
+        var position = e.pos;
+        var center = this.centerPointer;
 
         // angle in radians
-        let radians = Math.atan2(position.y - center.y, position.x - center.x);
+        var radians = Math.atan2(position.y - center.y, position.x - center.x);
 
         // angle in degrees
-        let degrees = Math.atan2(position.y - center.y, position.x - center.x) * 180 / Math.PI;
+        var degrees = Math.atan2(position.y - center.y, position.x - center.x) * 180 / Math.PI;
 
         degrees += 90;
 
@@ -164,9 +232,11 @@ game.Tank.TankContainer = me.Container.extend({
         // apply physics to the body (this moves the entity)
         this.body.update(dt);
 
+        this.updateChildBounds();
+
         return this._super(me.Container, "update", [dt]);
 
-        this.updateChildBounds();
+        // this.updateChildBounds();
     },
 
     onDestroyEvent : function () {
@@ -294,7 +364,12 @@ game.Tank.GunEntity = me.Entity.extend({
 
     },
 
-    centerRotate: (deg) => {
+    centerRotate : function (deg) {
+
+        this.renderable.currentTransform
+            .translate(this.renderable.width / 2, this.renderable.height - 10)
+            .rotate(deg * Math.PI / 180)
+            .translate(-this.renderable.width / 2, -(this.renderable.height - 10));
 
     },
 
@@ -303,6 +378,7 @@ game.Tank.GunEntity = me.Entity.extend({
      */
     update : function (dt) {
 
+        /*
         moveAngle = 0;
 
         if (me.input.isKeyPressed('z') || me.input.isKeyPressed('left')) {
@@ -315,10 +391,8 @@ game.Tank.GunEntity = me.Entity.extend({
         this.angle += deg;
 
         this.centerRotate(deg);
-        this.renderable.currentTransform
-            .translate(this.renderable.width / 2, this.renderable.height - 10)
-            .rotate(deg)
-            .translate(-this.renderable.width / 2, -(this.renderable.height - 10));
+        */
+
 
         // shoot
         if (me.input.isKeyPressed("shoot")) {

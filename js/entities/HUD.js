@@ -7,9 +7,9 @@ game.HUD = game.HUD || {};
 
 game.HUD.Container = me.Container.extend({
 
-    init: function() {
+    init: function(x, y) {
         // call the constructor
-        this._super(me.Container, 'init');
+        this._super(me.Container, 'init', [x, y]);
 
         // persistent across level change
         this.isPersistent = true;
@@ -20,11 +20,187 @@ game.HUD.Container = me.Container.extend({
         // give a name
         this.name = "HUD";
 
+        this.width = me.game.viewport.width;
+        this.height = me.game.viewport.height;
+
+        this.anchorPoint.x = 0;
+        this.anchorPoint.y = 0;
+
         // add our child score object at the top left corner
-        this.addChild(new game.HUD.ScoreItem(5, 5));
+        //this.addChild(new game.HUD.ScoreItem(-10, -10));
+
+
+        const leftSettings = {
+            name: 'JoystickLeft',
+            x: 10,
+            y: me.game.viewport.height - 170,
+            width: 160,
+            height: 160,
+        };
+
+        const rightSettings = {
+            name: 'JoystickRight',
+            x: me.game.viewport.width - 170,
+            y: me.game.viewport.height - 170,
+            width: 160,
+            height: 160,
+        };
+
+        const JoystickLeft = new game.HUD.JoystickContainer(leftSettings.x, leftSettings.y, leftSettings);
+        const JoystickRight = new game.HUD.JoystickContainer(rightSettings.x, rightSettings.y, rightSettings);
+
+        this.addChild(JoystickLeft, 2);
+        this.addChild(JoystickRight, 1);
+
+        const shootSettings = {
+            x: me.game.viewport.width - 220,
+            y: me.game.viewport.height - 220,
+            width: 80,
+            height: 80,
+            frameheight: 80,
+            framewidth: 80,
+            image: 'shoot-control',
+        };
+
+        me.pool.register("ShootEntity", game.HUD.UiShootEntity);
+        this.addChild(me.pool.pull("ShootEntity", shootSettings.x, shootSettings.y, shootSettings), 2);
+
+        this.updateChildBounds();
     }
 });
 
+game.HUD.JoystickContainer = me.Container.extend({
+
+    init: function(x, y, settings) {
+        // call the constructor
+        this._super(me.Container, 'init', [x, y]);
+
+        // persistent across level change
+        // this.isPersistent = true;
+
+        // make sure we use screen coordinates
+        this.floating = true;
+
+        // give a name
+        this.name = settings.name;
+
+        this.width = 160;
+        this.height = 160;
+
+        this.anchorPoint.x = 0;
+        this.anchorPoint.y = 0;
+
+        // add a physic body
+        // this.body = new me.Body(this);
+        // this.body.gravity = 0;
+
+        //this.setPoints()new Vector2d(xopt, yopt);
+        //this.setShape(this.x, this.y, this.width, this.height);
+
+
+        const topSettings = {
+            name: 'UiTopEntity',
+            x: 32,
+            y: 30,
+            width: 96,
+            height: 100,
+            frameheight: 100,
+            framewidth: 96,
+            image: 'top',
+        };
+
+        const bottomSettings = {
+            name: 'UiBottomEntity',
+            x: 0,
+            y: 0,
+            width: 160,
+            height: 160,
+            frameheight: 160,
+            framewidth: 160,
+            image: 'bottom',
+        };
+
+        me.pool.register("UiTopEntity", game.HUD.UiTopEntity);
+        me.pool.register("UiBottomEntity", game.HUD.UiBottomEntity);
+
+        this.addChild(me.pool.pull("UiTopEntity", topSettings.x, topSettings.y, topSettings), 2);
+        this.addChild(me.pool.pull("UiBottomEntity", bottomSettings.x, bottomSettings.y, bottomSettings), 1);
+
+        this.updateChildBounds();
+    }
+});
+
+game.HUD.UiTopEntity = me.Entity.extend({
+    /**
+     * constructor
+     */
+    init : function (x, y, settings) {
+
+        // call the constructor
+        this._super(me.Entity, 'init', [x, y, settings]);
+
+
+        this.body.gravity = 0;
+
+        // ensure the player is updated even when outside of the viewport
+        this.alwaysUpdate = true;
+
+    },
+
+});
+
+game.HUD.UiBottomEntity = me.Entity.extend({
+    /**
+     * constructor
+     */
+    init : function (x, y, settings) {
+
+        // call the constructor
+        this._super(me.Entity, 'init', [x, y, settings]);
+
+
+        this.body.gravity = 0;
+
+        // ensure the player is updated even when outside of the viewport
+        this.alwaysUpdate = true;
+
+    },
+
+});
+
+/**
+ * a shoot entity
+ */
+game.HUD.UiShootEntity = me.Entity.extend({
+    /**
+     * constructor
+     */
+    init : function (x, y, settings) {
+
+        // call the constructor
+        this._super(me.Entity, 'init', [x, y, settings]);
+
+        this.body.gravity = 0;
+
+        // ensure the player is updated even when outside of the viewport
+        this.alwaysUpdate = true;
+
+    },
+
+    /**
+     * update the entity
+     */
+    update : function (dt) {
+
+        // apply physics to the body (this moves the entity)
+        this.body.update(dt);
+
+        // return true if we moved or if the renderable was updated
+        return true;
+
+    },
+
+});
 
 /**
  * a basic HUD item to display score

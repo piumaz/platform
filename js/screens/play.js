@@ -14,11 +14,15 @@ game.PlayScreen = me.ScreenObject.extend({
         game.data.score = 0;
 
         // add our HUD to the game world
-        // this.HUD = new game.HUD.Container();
+        // this.HUD = new game.HUD.Container(0, 0);
         // me.game.world.addChild(this.HUD);
+
+        me.game.world.addChild(me.pool.pull("HUD", 0, 0));
 
 
         me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2));
+
+        // me.game.world.addChild(me.pool.pull("TankEnemyContainer", me.game.world.width / 2 - 150, me.game.world.height/2));
 
 
     },
@@ -28,7 +32,8 @@ game.PlayScreen = me.ScreenObject.extend({
      */
     onDestroyEvent : function () {
         // remove the HUD from the game world
-        me.game.world.removeChild(this.Tank);
+        //me.game.world.removeChild(this.Tank);
+
         // stop the current audio track
         me.audio.stopTrack();
     }

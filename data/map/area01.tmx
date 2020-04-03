@@ -37,6 +37,6 @@
   </object>
  </objectgroup>
  <objectgroup id="12" name="Tanks" locked="1"/>
- <objectgroup id="9" name="enemies" locked="1"/>
+ <objectgroup id="9" name="enemies"/>
  <objectgroup id="5" name="collision-objects" locked="1"/>
 </map>

@@ -89,33 +89,45 @@ game.Tank.TankContainer = me.Container.extend({
 
         const joystickLeft = HUD.getChildByName('JoystickLeft')[0];
         const joystickRight = HUD.getChildByName('JoystickRight')[0];
+        const shootButton = HUD.getChildByName('ShootEntity')[0];
+
+        me.event.subscribe("shoot", this.shoot.bind(this));
 
         me.input.registerPointerEvent('pointerdown', joystickLeft, this.start.bind(this));
         me.input.registerPointerEvent('pointermove', joystickLeft, this.move.bind(this));
         me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
 
-        me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this));
+        me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this, joystickRight));
         me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
+
 
     },
 
-    startGun: function (e) {
+    shoot: function () {
 
-        //console.log(e);
-        //console.log(joystickRight);
+        this.ancestor.addChild(me.pool.pull("BulletEntity",
+            this.pos.x + (this.width / 2) - 6,
+            this.pos.y + (this.height / 2),
+            {
+                name: 'BulletEntity',
+                width: 12,
+                height: 26,
+                frameheight: 26,
+                framewidth: 12,
+                image: 'bulletRed',
+                anchorPoint: {x:0,y:0},
+                angle: this.angleGun || 0
+            }
+        ), 10);
 
-        // this.centerGunPointer = {
-        //     x: joystickRight.pos.x + joystickRight.width / 2,
-        //     y: joystickRight.pos.y + joystickRight.height / 2,
-        // };
+    },
 
-        this.prevPosGun = e.pos;
+    startGun: function (joystickRight, e) {
 
         this.centerGunPointer = {
-            x: e.pos.x,
-            y: e.pos.y
+            x: joystickRight.pos.x + joystickRight.width / 2,
+            y: joystickRight.pos.y + joystickRight.height / 2,
         };
-
 
     },
 
@@ -127,49 +139,28 @@ game.Tank.TankContainer = me.Container.extend({
         // angle in radians
         var radians = Math.atan2(position.y - center.y, position.x - center.x);
 
-        //degrees = (degrees) * (Math.PI / 180);
+        // angle in degrees
+        var degrees = Math.atan2(position.y - center.y, position.x - center.x) * 180 / Math.PI;
 
-        //this.prevGunDegrees = degrees;
-        //this.pos.x += (this.speedx * Math.sin(this.angle));
-        //this.pos.y -= (this.speedy * Math.cos(this.angle));
+        degrees += 90;
 
-
-        //console.log(degrees - this.prevGunDegrees);
+        if (position.x < 0 ) {
+            degrees += 180;
+        } else if(position.y < 0 ) {
+            degrees += 360;
+        }
 
 
         const gun = this.getChildByName('GunEntity')[0];
-        if(radians > this.prevGunDegrees) {
-            radians = (radians - this.prevGunDegrees);
-        }
-        gun.centerRotate(radians);
-        this.prevGunDegrees = radians;
-        // if (degrees > this.prevGunDegrees) {
-        //     gun.centerRotate(1 * (degrees - this.prevDegrees) * Math.PI / 180);
-        // } else {
-        //     gun.centerRotate(-1 * (degrees - this.prevDegrees) * Math.PI / 180);
-        // }
-        // if (degrees > this.prevGunDegrees && (position.y > center.y)) {
-        //     moveAngle = -1;
-        // }
 
-        /*
-        if (position.x < center.x ) {
-            moveAngle = 1;
-        }
-        if (position.x > center.x ) {
-            moveAngle = -1;
-        }*/
+        this.angleGun += (degrees + this.prevGunDegrees) * (Math.PI / 180);
+
+        gun.centerRotate(this.prevGunDegrees);
+        gun.centerRotate(degrees);
 
 
-        //degrees = moveAngle * Math.PI / 180;
-
-        //degrees = (degrees - this.prevDegrees);
-        //console.log('degree', (degrees - this.prevDegrees));
-
-
+        this.prevGunDegrees = -degrees;
         this.prevPosGun = e.pos;
-        //this.prevGunDegrees = degrees;
-
 
     },
 
@@ -395,22 +386,22 @@ game.Tank.GunEntity = me.Entity.extend({
 
 
         // shoot
-        if (me.input.isKeyPressed("shoot")) {
-            this.ancestor.addChild(me.pool.pull("BulletEntity",
-                this.pos.x + (this.width / 2) - 6,
-                this.pos.y + (this.height / 2),
-                {
-                    name: 'BulletEntity',
-                    width: 12,
-                    height: 26,
-                    frameheight: 26,
-                    framewidth: 12,
-                    image: 'bulletRed',
-                    anchorPoint: {x:0,y:0},
-                    angle: this.angle
-                }
-                ), 1);
-        }
+        // if (me.input.isKeyPressed("shoot")) {
+        //     this.ancestor.addChild(me.pool.pull("BulletEntity",
+        //         this.pos.x + (this.width / 2) - 6,
+        //         this.pos.y + (this.height / 2),
+        //         {
+        //             name: 'BulletEntity',
+        //             width: 12,
+        //             height: 26,
+        //             frameheight: 26,
+        //             framewidth: 12,
+        //             image: 'bulletRed',
+        //             anchorPoint: {x:0,y:0},
+        //             angle: this.angle
+        //         }
+        //         ), 1);
+        // }
 
 
         // apply physics to the body (this moves the entity)
@@ -444,7 +435,7 @@ game.Tank.BulletEntity = me.Entity.extend({
         this.body.collisionType = me.collision.types.PROJECTILE_OBJECT;
 
 
-        this.body.getShape(0).rotate(this.config.angle);
+        // this.body.getShape(0).rotate(this.config.angle);
 
         //this.body.rotate(this.config.angle);
 
@@ -455,8 +446,6 @@ game.Tank.BulletEntity = me.Entity.extend({
             .translate(-(this.width / 2), -(this.height) );
 
          */
-
-
 
         this.renderable.currentTransform
             .translate(this.renderable.width / 2, (this.renderable.height - 5) )

@@ -53,8 +53,9 @@ game.HUD.Container = me.Container.extend({
         this.addChild(JoystickRight, 1);
 
         const shootSettings = {
-            x: me.game.viewport.width - 220,
-            y: me.game.viewport.height - 220,
+            name: 'ShootEntity',
+            x: me.game.viewport.width - 180,
+            y: me.game.viewport.height - 180,
             width: 80,
             height: 80,
             frameheight: 80,
@@ -63,7 +64,7 @@ game.HUD.Container = me.Container.extend({
         };
 
         me.pool.register("ShootEntity", game.HUD.UiShootEntity);
-        this.addChild(me.pool.pull("ShootEntity", shootSettings.x, shootSettings.y, shootSettings), 2);
+        this.addChild(me.pool.pull("ShootEntity", shootSettings.x, shootSettings.y, shootSettings), 3);
 
         this.updateChildBounds();
     }
@@ -171,35 +172,25 @@ game.HUD.UiBottomEntity = me.Entity.extend({
 /**
  * a shoot entity
  */
-game.HUD.UiShootEntity = me.Entity.extend({
+game.HUD.UiShootEntity = me.GUI_Object.extend({
     /**
      * constructor
      */
     init : function (x, y, settings) {
 
         // call the constructor
-        this._super(me.Entity, 'init', [x, y, settings]);
-
-        this.body.gravity = 0;
-
-        // ensure the player is updated even when outside of the viewport
-        this.alwaysUpdate = true;
+        this._super(me.GUI_Object, 'init', [x, y, settings]);
 
     },
 
-    /**
-     * update the entity
-     */
-    update : function (dt) {
-
-        // apply physics to the body (this moves the entity)
-        this.body.update(dt);
-
-        // return true if we moved or if the renderable was updated
-        return true;
-
-    },
-
+    // output something in the console
+    // when the object is clicked
+    onClick:function (event)
+    {
+        me.event.publish("shoot");
+        // don't propagate the event
+        return false;
+    }
 });
 
 /**

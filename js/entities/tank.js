@@ -421,6 +421,7 @@ game.Tank.TankEntity = me.Entity.extend({
 
             case me.collision.types.ENEMY_OBJECT:
 
+                console.log(other);
                 this.renderable.flicker(750);
 
 

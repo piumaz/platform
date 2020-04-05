@@ -27,7 +27,7 @@ game.HUD.Container = me.Container.extend({
         this.anchorPoint.y = 0;
 
         // add our child score object at the top left corner
-        //this.addChild(new game.HUD.ScoreItem(-10, -10));
+        this.addChild(new game.HUD.ScoreItem(0, 10));
 
 
         const leftSettings = {
@@ -95,63 +95,62 @@ game.HUD.JoystickContainer = me.Container.extend({
         this.anchorPoint.y = 0;
 
         const topSettings = {
-            name: 'UiTopEntity',
-            // x: 32,
-            // y: 30,
-            x: (settings.width - 160) / 2  + 32,
-            y: (settings.height - 160) / 2 + 30,
+            name: 'UiTopSprite',
+            x: (settings.width / 2) - 48,
+            y: (settings.height / 2) - 50,
             width: 96,
             height: 100,
             frameheight: 100,
             framewidth: 96,
             image: 'top',
+            anchorPoint: {x:0,y:0}
         };
 
         const bottomSettings = {
-            name: 'UiBottomEntity',
-            x: (settings.width - 160) / 2,
-            y: (settings.height - 160) / 2,
+            name: 'UiBottomSprite',
+            x: (settings.width / 2) - 80,
+            y: (settings.height / 2) - 80,
             width: 160,
             height: 160,
             frameheight: 160,
             framewidth: 160,
             image: 'bottom',
+            anchorPoint: {x:0,y:0}
         };
 
-        me.pool.register("UiTopEntity", game.HUD.UiTopEntity);
-        me.pool.register("UiBottomEntity", game.HUD.UiBottomEntity);
 
-        this.addChild(me.pool.pull("UiTopEntity", topSettings.x, topSettings.y, topSettings), 2);
-        this.addChild(me.pool.pull("UiBottomEntity", bottomSettings.x, bottomSettings.y, bottomSettings), 1);
+        this.addChild(new game.HUD.UiTopSprite(topSettings.x, topSettings.y, topSettings), 2);
+        this.addChild(new game.HUD.UiBottomSprite(bottomSettings.x, bottomSettings.y, bottomSettings), 1);
 
         this.updateChildBounds();
     }
 });
 
-game.HUD.UiTopEntity = me.Entity.extend({
+game.HUD.UiTopSprite = me.Sprite.extend({
     /**
      * constructor
      */
     init : function (x, y, settings) {
 
         // call the constructor
-        this._super(me.Entity, 'init', [x, y, settings]);
+        this._super(me.Sprite, 'init', [x, y, settings]);
 
-        this.renderable.setOpacity(0.9);
+        //this.body.collisionType = me.collision.types.;
+        this.setOpacity(0.9);
     },
 
 });
 
-game.HUD.UiBottomEntity = me.Entity.extend({
+game.HUD.UiBottomSprite = me.Sprite.extend({
     /**
      * constructor
      */
     init : function (x, y, settings) {
 
         // call the constructor
-        this._super(me.Entity, 'init', [x, y, settings]);
+        this._super(me.Sprite, 'init', [x, y, settings]);
 
-        this.renderable.setOpacity(0.7);
+        this.setOpacity(0.7);
 
 
     },
@@ -199,7 +198,7 @@ game.HUD.ScoreItem = me.Renderable.extend( {
 
         // font alignment to right, bottom
         this.font.textAlign = "right";
-        this.font.textBaseline = "bottom";
+        this.font.textBaseline = "top";
 
         // local copy of the global score
         this.score = -1;
@@ -223,6 +222,6 @@ game.HUD.ScoreItem = me.Renderable.extend( {
      */
     draw : function (renderer) {
         // this.pos.x, this.pos.y are the relative position from the screen right bottom
-        this.font.draw (renderer, game.data.score, me.game.viewport.width + this.pos.x, me.game.viewport.height + this.pos.y);
+        this.font.draw (renderer, game.data.score, me.game.viewport.width + this.pos.x, this.pos.y);
     }
 });

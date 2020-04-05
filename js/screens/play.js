@@ -1,4 +1,4 @@
-game.PlayScreen = me.ScreenObject.extend({
+game.PlayScreen = me.Stage.extend({
     /**
      * action to perform on state change
      */
@@ -8,7 +8,7 @@ game.PlayScreen = me.ScreenObject.extend({
         me.levelDirector.loadLevel("area01");
 
         // play the audio track
-        // me.audio.playTrack("dst-inertexponent");
+        me.audio.playTrack("gun_battle_sound-ReamProductions", 0.1);
 
         // reset the score
         game.data.score = 0;
@@ -19,11 +19,9 @@ game.PlayScreen = me.ScreenObject.extend({
 
         me.game.world.addChild(me.pool.pull("HUD", 0, 0));
 
+        me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2), 10);
 
-        me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2));
-
-        // me.game.world.addChild(me.pool.pull("TankEnemyContainer", me.game.world.width / 2 - 150, me.game.world.height/2));
-
+        //me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2 - 150, me.game.world.height/2));
 
     },
 
@@ -35,6 +33,6 @@ game.PlayScreen = me.ScreenObject.extend({
         //me.game.world.removeChild(this.Tank);
 
         // stop the current audio track
-        me.audio.stopTrack();
+        // me.audio.stopTrack();
     }
 })

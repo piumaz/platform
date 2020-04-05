@@ -32,10 +32,10 @@ game.HUD.Container = me.Container.extend({
 
         const leftSettings = {
             name: 'JoystickLeft',
-            x: 10,
-            y: me.game.viewport.height - 170,
-            width: 160,
-            height: 160,
+            x: -40,
+            y: me.game.viewport.height - 220,
+            width: 260,
+            height: 260,
         };
 
         const rightSettings = {
@@ -43,19 +43,22 @@ game.HUD.Container = me.Container.extend({
             x: me.game.viewport.width - 170,
             y: me.game.viewport.height - 170,
             width: 160,
-            height: 160,
+            height: 160
         };
 
         const JoystickLeft = new game.HUD.JoystickContainer(leftSettings.x, leftSettings.y, leftSettings);
         const JoystickRight = new game.HUD.JoystickContainer(rightSettings.x, rightSettings.y, rightSettings);
+        // add an ellipse shape
+        //JoystickRight.body.addShape(new me.Ellipse(this.width/2, this.height/2, this.width, this.height));
+
 
         this.addChild(JoystickLeft, 2);
         this.addChild(JoystickRight, 1);
 
         const shootSettings = {
             name: 'ShootEntity',
-            x: me.game.viewport.width - 180,
-            y: me.game.viewport.height - 180,
+            x: me.game.viewport.width - 220,
+            y: me.game.viewport.height - 90,
             width: 80,
             height: 80,
             frameheight: 80,
@@ -74,7 +77,7 @@ game.HUD.JoystickContainer = me.Container.extend({
 
     init: function(x, y, settings) {
         // call the constructor
-        this._super(me.Container, 'init', [x, y]);
+        this._super(me.Container, 'init', [x, y, settings.width, settings.height]);
 
         // persistent across level change
         // this.isPersistent = true;
@@ -85,24 +88,18 @@ game.HUD.JoystickContainer = me.Container.extend({
         // give a name
         this.name = settings.name;
 
-        this.width = 160;
-        this.height = 160;
+        //this.width = settings.width;
+        //this.height = settings.height;
 
         this.anchorPoint.x = 0;
         this.anchorPoint.y = 0;
 
-        // add a physic body
-        // this.body = new me.Body(this);
-        // this.body.gravity = 0;
-
-        //this.setPoints()new Vector2d(xopt, yopt);
-        //this.setShape(this.x, this.y, this.width, this.height);
-
-
         const topSettings = {
             name: 'UiTopEntity',
-            x: 32,
-            y: 30,
+            // x: 32,
+            // y: 30,
+            x: (settings.width - 160) / 2  + 32,
+            y: (settings.height - 160) / 2 + 30,
             width: 96,
             height: 100,
             frameheight: 100,
@@ -112,8 +109,8 @@ game.HUD.JoystickContainer = me.Container.extend({
 
         const bottomSettings = {
             name: 'UiBottomEntity',
-            x: 0,
-            y: 0,
+            x: (settings.width - 160) / 2,
+            y: (settings.height - 160) / 2,
             width: 160,
             height: 160,
             frameheight: 160,
@@ -140,12 +137,7 @@ game.HUD.UiTopEntity = me.Entity.extend({
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
 
-
-        this.body.gravity = 0;
-
-        // ensure the player is updated even when outside of the viewport
-        this.alwaysUpdate = true;
-
+        this.renderable.setOpacity(0.9);
     },
 
 });
@@ -159,11 +151,8 @@ game.HUD.UiBottomEntity = me.Entity.extend({
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
 
+        this.renderable.setOpacity(0.7);
 
-        this.body.gravity = 0;
-
-        // ensure the player is updated even when outside of the viewport
-        this.alwaysUpdate = true;
 
     },
 

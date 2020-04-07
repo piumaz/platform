@@ -19,9 +19,9 @@ game.PlayScreen = me.Stage.extend({
 
         me.game.world.addChild(me.pool.pull("HUD", 0, 0));
 
-        me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2), 10);
+        me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2, me.game.world.height/2), 5);
 
-        //me.game.world.addChild(me.pool.pull("TankContainer", me.game.world.width / 2 - 150, me.game.world.height/2));
+        me.game.world.addChild(me.pool.pull("EnemyContainer", me.game.world.width / 2 - 150, me.game.world.height/2), 6);
 
     },
 

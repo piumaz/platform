@@ -1,3 +1,4 @@
+
 /* game namespace */
 var game = {
     /**
@@ -27,6 +28,8 @@ var game = {
 
         me.pool.register("HUD", game.HUD.Container);
         me.pool.register("TankContainer", game.Tank.TankContainer);
+        me.pool.register("EnemyContainer", game.Enemy.EnemyContainer);
+
         me.pool.register("CoinEntity", game.CoinEntity);
         // me.pool.register("EnemyEntity", game.EnemyEntity);
 

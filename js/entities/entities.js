@@ -2,18 +2,19 @@
 /**
  * a Coin entity
  */
-game.CoinEntity = me.CollectableEntity.extend({
+class CoinEntity extends me.CollectableEntity {
+
     // extending the init function is not mandatory
     // unless you need to add some extra initialization
-    init: function (x, y, settings) {
+    init(x, y, settings) {
         // call the parent constructor
         this._super(me.CollectableEntity, 'init', [x, y , settings]);
 
-    },
+    }
 
     // this function is called by the engine, when
     // an object is touched by something (here collected)
-    onCollision : function () {
+    onCollision() {
         // do something when collected
 
         // play a "coin collected" sound
@@ -28,11 +29,12 @@ game.CoinEntity = me.CollectableEntity.extend({
         // remove it
         me.game.world.removeChild(this);
     }
-});
+}
 
 /**
  * an enemy Entity
  */
+/*
 game.EnemyEntity = me.Sprite.extend({
     init: function (x, y, settings) {
         // save the area size as defined in Tiled
@@ -106,12 +108,12 @@ game.EnemyEntity = me.Sprite.extend({
         return (this._super(me.Sprite, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     },
 
-    /**
+    /!**
      * colision handler
      * (called when colliding with other objects)
-     */
+     *!/
     onCollision : function (response, other) {
-        /*
+        /!*
         if (response.b.body.collisionType !== me.collision.types.WORLD_SHAPE) {
             // res.y >0 means touched by something on the bottom
             // which mean at top position for this one
@@ -120,9 +122,10 @@ game.EnemyEntity = me.Sprite.extend({
             }
             return false;
         }
-        */
+        *!/
 
         // Make all other objects solid
         return true;
     }
 });
+*/

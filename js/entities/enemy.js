@@ -1,11 +1,8 @@
-/**
- * tank container
- */
-game.Enemy = game.Enemy || {};
+import TankContainer from './tank';
 
-game.Enemy.EnemyContainer = game.Tank.TankContainer.extend({
+class EnemyContainer extends TankContainer {
 
-    init: function (x, y, w, h) {
+    init(x, y, w, h) {
         // call the constructor
         this._super(me.Container, 'init', [x, y, w, h]);
 
@@ -23,9 +20,9 @@ game.Enemy.EnemyContainer = game.Tank.TankContainer.extend({
         me.input.bindKey(me.input.KEY.UP, "up");
         me.input.bindKey(me.input.KEY.DOWN, "down");
 
-    },
+    }
 
-    update : function (dt) {
+    update(dt) {
 
 
         let moveAngle = 0;
@@ -63,13 +60,13 @@ game.Enemy.EnemyContainer = game.Tank.TankContainer.extend({
 
         return this._super(me.Container, "update", [dt]);
 
-    },
+    }
 
     /**
      * collision handler
      */
-    onCollision : function (response, other) {
+    onCollision(response, other) {
         return false;
-    },
+    }
 
-});
+}

@@ -1,8 +1,10 @@
-game.PlayScreen = me.Stage.extend({
+import game from './game';
+
+export class PlayScreen extends me.Stage {
     /**
      * action to perform on state change
      */
-    onResetEvent : function () {
+    onResetEvent() {
 
         // load a level
         me.levelDirector.loadLevel("area01");
@@ -23,16 +25,16 @@ game.PlayScreen = me.Stage.extend({
 
         me.game.world.addChild(me.pool.pull("EnemyContainer", me.game.world.width / 2 - 150, me.game.world.height/2), 6);
 
-    },
+    }
 
     /**
      * action to perform when leaving this screen (state change)
      */
-    onDestroyEvent : function () {
+    onDestroyEvent() {
         // remove the HUD from the game world
         //me.game.world.removeChild(this.Tank);
 
         // stop the current audio track
         // me.audio.stopTrack();
     }
-})
+}

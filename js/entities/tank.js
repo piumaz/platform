@@ -1,12 +1,9 @@
 /**
  * tank container
  */
-game.Tank = game.Tank || {};
+class TankContainer extends me.Container {
 
-
-game.Tank.TankContainer = me.Container.extend({
-
-    init: function (x, y, w, h) {
+    init(x, y, w, h) {
         // call the constructor
         this._super(me.Container, 'init', [x, y, w, h]);
 
@@ -21,9 +18,9 @@ game.Tank.TankContainer = me.Container.extend({
 
         // set the display to follow our position on both axis
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH, 0.4);
-    },
+    }
 
-    setUiInteraction: function () {
+    setUiInteraction() {
 
         const HUD = me.game.world.getChildByName('HUD')[0];
 
@@ -41,9 +38,9 @@ game.Tank.TankContainer = me.Container.extend({
         me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
         me.input.registerPointerEvent('pointerleave', joystickRight, this.stopGun.bind(this));
 
-    },
+    }
 
-    update : function (dt) {
+    update (dt) {
 
         if (me.audio.seek("tank") >= 2.38) {
             me.audio.seek("tank", 1.2);
@@ -98,12 +95,12 @@ game.Tank.TankContainer = me.Container.extend({
 
         return this._super(me.Container, "update", [dt]);
 
-    },
+    }
 
     /**
      * collision handler
      */
-    onCollision : function (response, other) {
+    onCollision (response, other) {
 
         switch (response.b.body.collisionType) {
 
@@ -131,15 +128,15 @@ game.Tank.TankContainer = me.Container.extend({
         }
 
         return false;
-    },
+    }
 
-    onDestroyEvent : function () {
+    onDestroyEvent () {
         // remove the HUD from the game world
         this.removeChild( this.getChildByName('TankEntity') );
         this.removeChild( this.getChildByName('GunEntity') );
-    },
+    }
 
-    setBody: function () {
+    setBody() {
 
         this.body = new me.Body(this);
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
@@ -149,9 +146,9 @@ game.Tank.TankContainer = me.Container.extend({
         this.body.setFriction(0, 0);
 
         this.alwaysUpdate = true;
-    },
+    }
 
-    setVar: function () {
+    setVar() {
 
         this.prevTrackPos = {
             x: 0,
@@ -177,15 +174,15 @@ game.Tank.TankContainer = me.Container.extend({
         this.anchorPoint.x = 0;
         this.anchorPoint.y = 0;
 
-    },
+    }
 
-    mount: function () {
+    mount() {
 
-        me.pool.register("TankEntity", game.Tank.TankEntity);
-        me.pool.register("GunEntity", game.Tank.GunEntity);
-        me.pool.register("BulletEntity", game.Tank.BulletEntity);
-        me.pool.register("FireEntity", game.Tank.FireEntity);
-        me.pool.register("TracksEntity", game.Tank.TracksEntity);
+        me.pool.register("TankEntity", TankEntity);
+        me.pool.register("GunEntity", GunEntity);
+        me.pool.register("BulletEntity", BulletEntity);
+        me.pool.register("FireEntity", FireEntity);
+        me.pool.register("TracksEntity", TracksEntity);
 
 
         const tankSettings = {
@@ -218,9 +215,9 @@ game.Tank.TankContainer = me.Container.extend({
         this.height = tankSettings.height;
 
         this.updateChildBounds();
-    },
+    }
 
-    shoot: function () {
+    shoot() {
 
         if ( this.getChildByName('BulletEntity').length > 1) {
             return;
@@ -266,7 +263,7 @@ game.Tank.TankContainer = me.Container.extend({
 
     },
 
-    startGun: function (joystickRight, e) {
+    startGun(joystickRight, e) {
 
         me.audio.playTrack("gun", 0.4);
 
@@ -275,15 +272,15 @@ game.Tank.TankContainer = me.Container.extend({
             y: joystickRight.pos.y + joystickRight.height / 2,
         };
 
-    },
+    }
 
-    stopGun: function (e) {
+    stopGun(e) {
 
         me.audio.stopTrack("gun");
 
-    },
+    }
 
-    rotateGun: function (e) {
+    rotateGun(e) {
 
         var position = e.pos;
         var center = this.centerGunPointer;
@@ -317,9 +314,9 @@ game.Tank.TankContainer = me.Container.extend({
         this.prevPosGun = e.pos;
 
 
-    },
+    }
 
-    start: function (e) {
+    start(e) {
 
         this.isStarted = true;
 
@@ -335,9 +332,9 @@ game.Tank.TankContainer = me.Container.extend({
         this.speedy = 0;
 
 
-    },
+    }
 
-    stop: function (e) {
+    stop(e) {
 
         this.isStarted = false;
 
@@ -346,9 +343,9 @@ game.Tank.TankContainer = me.Container.extend({
         this.speedx = 0;
         this.speedy = 0;
 
-    },
+    }
 
-    move: function (e) {
+    move(e) {
 
         if (!this.isStarted) return;
 
@@ -384,18 +381,18 @@ game.Tank.TankContainer = me.Container.extend({
 
 
 
-    },
+    }
 
-});
+}
 
 /**
  * a tank entity
  */
-game.Tank.TankEntity = me.Entity.extend({
+class TankEntity extends me.Entity {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init (x, y, settings) {
 
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
@@ -407,26 +404,26 @@ game.Tank.TankEntity = me.Entity.extend({
         this.renderable.flipY(true).flipX(true);
 
 
-    },
+    }
 
-    centerRotate : function (deg) {
+    centerRotate (deg) {
 
         this.renderable.currentTransform
             .translate(this.renderable.width / 2, this.renderable.height / 2)
             .rotate(deg * Math.PI / 180)
             .translate(-this.renderable.width / 2, -this.renderable.height / 2);
-    },
+    }
 
-});
+}
 
 /**
  * a gun entity
  */
-game.Tank.GunEntity = me.Entity.extend({
+class GunEntity extends me.Entity {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init (x, y, settings) {
 
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
@@ -436,24 +433,24 @@ game.Tank.GunEntity = me.Entity.extend({
         this.angle = 0;
 
 
-    },
+    }
 
-    centerRotate : function (deg) {
+    centerRotate (deg) {
 
         this.renderable.currentTransform
             .translate(this.renderable.width / 2, this.renderable.height - 10)
             .rotate(deg * Math.PI / 180)
             .translate(-this.renderable.width / 2, -(this.renderable.height - 10));
 
-    },
+    }
 
-});
+}
 
-game.Tank.TracksEntity = me.Entity.extend({
+class TracksEntity extends me.Entity {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init (x, y, settings) {
 
         this._super(me.Entity, 'init', [x, y, settings]);
 
@@ -483,15 +480,15 @@ game.Tank.TracksEntity = me.Entity.extend({
             }
         }, 1000);
 
-    },
+    }
 
-});
+}
 
-game.Tank.FireEntity = me.Entity.extend({
+class FireEntity extends me.Entity {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init (x, y, settings) {
 
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
@@ -508,17 +505,17 @@ game.Tank.FireEntity = me.Entity.extend({
             this.ancestor.removeChild(this);
         }, 100);
 
-    },
+    }
 
 
-});
+}
 
 /**
  * a bullet entity
  */
-game.Tank.BulletEntity = me.Entity.extend({
+class BulletEntity extends me.Entity {
 
-    init : function (x, y, settings) {
+    init (x, y, settings) {
 
 
         this._super(me.Entity, "init", [x, y, settings]);
@@ -539,9 +536,9 @@ game.Tank.BulletEntity = me.Entity.extend({
             .translate(-(this.renderable.width) / 2, -(this.renderable.height) );
 
         this.alwaysUpdate = true;
-    },
+    }
 
-    update : function (time) {
+    update (time) {
 
         this.body.vel.x += this.body.accel.x * time / 1000 * (Math.sin(this.config.angle));
         this.body.vel.y -= this.body.accel.y * time / 1000 * (Math.cos(this.config.angle));
@@ -561,9 +558,9 @@ game.Tank.BulletEntity = me.Entity.extend({
         }
 
         //return true;
-    },
+    }
 
-    onCollision : function (res, other) {
+    onCollision (res, other) {
 
 
         if (other.body.collisionType === me.collision.types.WORLD_SHAPE) {
@@ -588,4 +585,4 @@ game.Tank.BulletEntity = me.Entity.extend({
         return false;
     }
 
-});
+}

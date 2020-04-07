@@ -2,12 +2,9 @@
  * a HUD container and child items
  */
 
-game.HUD = game.HUD || {};
+class HUD extends me.Container {
 
-
-game.HUD.Container = me.Container.extend({
-
-    init: function(x, y) {
+    init(x, y) {
         // call the constructor
         this._super(me.Container, 'init', [x, y]);
 
@@ -71,11 +68,11 @@ game.HUD.Container = me.Container.extend({
 
         this.updateChildBounds();
     }
-});
+}
 
-game.HUD.JoystickContainer = me.Container.extend({
+class JoystickContainer extends me.Container {
 
-    init: function(x, y, settings) {
+    init(x, y, settings) {
         // call the constructor
         this._super(me.Container, 'init', [x, y, settings.width, settings.height]);
 
@@ -124,13 +121,13 @@ game.HUD.JoystickContainer = me.Container.extend({
 
         this.updateChildBounds();
     }
-});
+}
 
-game.HUD.UiTopSprite = me.Sprite.extend({
+class UiTopSprite extends me.Sprite {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init(x, y, settings) {
 
         // call the constructor
         this._super(me.Sprite, 'init', [x, y, settings]);
@@ -139,13 +136,13 @@ game.HUD.UiTopSprite = me.Sprite.extend({
         this.setOpacity(0.9);
     },
 
-});
+}
 
-game.HUD.UiBottomSprite = me.Sprite.extend({
+class UiBottomSprite extends me.Sprite {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init(x, y, settings) {
 
         // call the constructor
         this._super(me.Sprite, 'init', [x, y, settings]);
@@ -153,18 +150,18 @@ game.HUD.UiBottomSprite = me.Sprite.extend({
         this.setOpacity(0.7);
 
 
-    },
+    }
 
-});
+}
 
 /**
  * a shoot entity
  */
-game.HUD.UiShootEntity = me.GUI_Object.extend({
+class UiShootEntity extends me.GUI_Object {
     /**
      * constructor
      */
-    init : function (x, y, settings) {
+    init(x, y, settings) {
 
         // call the constructor
         this._super(me.GUI_Object, 'init', [x, y, settings]);
@@ -173,22 +170,21 @@ game.HUD.UiShootEntity = me.GUI_Object.extend({
 
     // output something in the console
     // when the object is clicked
-    onClick:function (event)
-    {
+    onClick(event) {
         me.event.publish("shoot");
         // don't propagate the event
         return false;
     }
-});
+}
 
 /**
  * a basic HUD item to display score
  */
-game.HUD.ScoreItem = me.Renderable.extend( {
+class ScoreItem extends me.Renderable {
     /**
      * constructor
      */
-    init : function (x, y) {
+    init(x, y) {
         // call the parent constructor
         // (size does not matter here)
         this._super(me.Renderable, 'init', [x, y, 10, 10]);
@@ -207,7 +203,7 @@ game.HUD.ScoreItem = me.Renderable.extend( {
     /**
      * update function
      */
-    update : function (dt) {
+    update(dt) {
         // we don't draw anything fancy here, so just
         // return true if the score has been updated
         if (this.score !== game.data.score) {
@@ -220,8 +216,8 @@ game.HUD.ScoreItem = me.Renderable.extend( {
     /**
      * draw the score
      */
-    draw : function (renderer) {
+    draw(renderer) {
         // this.pos.x, this.pos.y are the relative position from the screen right bottom
         this.font.draw (renderer, game.data.score, me.game.viewport.width + this.pos.x, this.pos.y);
     }
-});
+}

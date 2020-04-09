@@ -1,6 +1,7 @@
+import {me} from 'melonjs';
 import TankContainer from './tank';
 
-class EnemyContainer extends TankContainer {
+export default class EnemyContainer extends TankContainer {
 
     init(x, y, w, h) {
         // call the constructor

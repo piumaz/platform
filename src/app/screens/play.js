@@ -1,6 +1,7 @@
-import game from './game';
+import {me} from 'melonjs';
+import game from './../game';
 
-export class PlayScreen extends me.Stage {
+export default class PlayScreen extends me.Stage {
     /**
      * action to perform on state change
      */

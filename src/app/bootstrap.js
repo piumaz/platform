@@ -1,4 +1,5 @@
-import game from './game';
+import {me} from 'melonjs';
+
 import resources from './resources';
 
 import HUD from './entities/HUD';
@@ -19,19 +20,24 @@ class Bootstrap {
             return;
         }
 
+        if (me.debug) {
+            me.debug.renderHitBox = true;
+        }
+
         // Initialize the audio.
         me.audio.init("mp3,ogg");
 
         // set all ressources to be loaded
         me.loader.preload(resources, this.loaded.bind(this));
 
+
     }
 
     loaded() {
 
         me.pool.register("HUD", HUD);
-        me.pool.register("Tank", Tank);
-        me.pool.register("Enemys", Enemy);
+        me.pool.register("TankContainer", TankContainer);
+        me.pool.register("EnemyContainer", EnemyContainer);
 
         me.pool.register("CoinEntity", CoinEntity);
         // me.pool.register("EnemyEntity", game.EnemyEntity);
@@ -79,7 +85,7 @@ class Bootstrap {
             (function () {
                 window.scrollTo(0, 1);
                 me.video.onresize(null);
-            }).defer();
+            }); //.defer();
 
             me.event.subscribe(me.event.WINDOW_ONRESIZE, function (e) {
                 window.scrollTo(0, 1);

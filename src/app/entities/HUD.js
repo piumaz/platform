@@ -1,8 +1,11 @@
+import {me} from 'melonjs';
+import game from './../game';
+
 /**
  * a HUD container and child items
  */
 
-class HUD extends me.Container {
+export default class HUD extends me.Container {
 
     init(x, y) {
         // call the constructor
@@ -24,7 +27,7 @@ class HUD extends me.Container {
         this.anchorPoint.y = 0;
 
         // add our child score object at the top left corner
-        this.addChild(new game.HUD.ScoreItem(0, 10));
+        this.addChild(new ScoreItem(0, 10));
 
 
         const leftSettings = {
@@ -43,8 +46,8 @@ class HUD extends me.Container {
             height: 160
         };
 
-        const JoystickLeft = new game.HUD.JoystickContainer(leftSettings.x, leftSettings.y, leftSettings);
-        const JoystickRight = new game.HUD.JoystickContainer(rightSettings.x, rightSettings.y, rightSettings);
+        const JoystickLeft = new JoystickContainer(leftSettings.x, leftSettings.y, leftSettings);
+        const JoystickRight = new JoystickContainer(rightSettings.x, rightSettings.y, rightSettings);
         // add an ellipse shape
         //JoystickRight.body.addShape(new me.Ellipse(this.width/2, this.height/2, this.width, this.height));
 
@@ -58,12 +61,11 @@ class HUD extends me.Container {
             y: me.game.viewport.height - 90,
             width: 80,
             height: 80,
-            frameheight: 80,
-            framewidth: 80,
+
             image: 'shoot-control',
         };
 
-        me.pool.register("ShootEntity", game.HUD.UiShootEntity);
+        me.pool.register("ShootEntity", UiShootEntity);
         this.addChild(me.pool.pull("ShootEntity", shootSettings.x, shootSettings.y, shootSettings), 3);
 
         this.updateChildBounds();
@@ -116,8 +118,8 @@ class JoystickContainer extends me.Container {
         };
 
 
-        this.addChild(new game.HUD.UiTopSprite(topSettings.x, topSettings.y, topSettings), 2);
-        this.addChild(new game.HUD.UiBottomSprite(bottomSettings.x, bottomSettings.y, bottomSettings), 1);
+        this.addChild(new UiTopSprite(topSettings.x, topSettings.y, topSettings), 2);
+        this.addChild(new UiBottomSprite(bottomSettings.x, bottomSettings.y, bottomSettings), 1);
 
         this.updateChildBounds();
     }
@@ -134,7 +136,7 @@ class UiTopSprite extends me.Sprite {
 
         //this.body.collisionType = me.collision.types.;
         this.setOpacity(0.9);
-    },
+    }
 
 }
 
@@ -166,7 +168,7 @@ class UiShootEntity extends me.GUI_Object {
         // call the constructor
         this._super(me.GUI_Object, 'init', [x, y, settings]);
 
-    },
+    }
 
     // output something in the console
     // when the object is clicked
@@ -198,7 +200,7 @@ class ScoreItem extends me.Renderable {
 
         // local copy of the global score
         this.score = -1;
-    },
+    }
 
     /**
      * update function
@@ -211,7 +213,7 @@ class ScoreItem extends me.Renderable {
             return true;
         }
         return false;
-    },
+    }
 
     /**
      * draw the score

@@ -1,7 +1,9 @@
+import {me} from 'melonjs';
+
 /**
  * tank container
  */
-class TankContainer extends me.Container {
+export default class TankContainer extends me.Container {
 
     init(x, y, w, h) {
         // call the constructor
@@ -132,8 +134,8 @@ class TankContainer extends me.Container {
 
     onDestroyEvent () {
         // remove the HUD from the game world
-        this.removeChild( this.getChildByName('TankEntity') );
-        this.removeChild( this.getChildByName('GunEntity') );
+        // this.removeChild( this.getChildByName('TankEntity') );
+        // this.removeChild( this.getChildByName('GunEntity') );
     }
 
     setBody() {
@@ -261,7 +263,7 @@ class TankContainer extends me.Container {
         ), 15);
 
 
-    },
+    }
 
     startGun(joystickRight, e) {
 

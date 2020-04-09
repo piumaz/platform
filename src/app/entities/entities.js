@@ -1,8 +1,10 @@
+import {me} from 'melonjs';
+import game from './../game';
 
 /**
  * a Coin entity
  */
-class CoinEntity extends me.CollectableEntity {
+export default class CoinEntity extends me.CollectableEntity {
 
     // extending the init function is not mandatory
     // unless you need to add some extra initialization

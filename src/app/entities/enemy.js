@@ -54,7 +54,7 @@ export default class EnemyContainer extends TankContainer {
 
 
         if(data.hit) {
-            this.flicker(100);
+            this.explode();
         }
 
         if(data.shoot) {

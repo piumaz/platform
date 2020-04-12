@@ -41,9 +41,15 @@ export default class TankContainer extends me.Container {
 
         me.event.subscribe("shoot", this.shoot.bind(this));
 
-        me.input.registerPointerEvent('pointerdown', joystickLeft, this.start.bind(this));
-        me.input.registerPointerEvent('pointermove', joystickLeft, this.move.bind(this));
-        me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
+        // me.input.registerPointerEvent('pointerdown', joystickLeft, this.start.bind(this));
+        // me.input.registerPointerEvent('pointermove', joystickLeft, this.move.bind(this));
+        // me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
+
+        me.input.registerPointerEvent('pointerdown',    me.game.viewport, this.start.bind(this));
+        me.input.registerPointerEvent('pointermove',    me.game.viewport, this.move.bind(this));
+        me.input.registerPointerEvent('pointerleave',   me.game.viewport, this.stop.bind(this));
+        me.input.registerPointerEvent('pointerup',      me.game.viewport, this.stop.bind(this));
+
 
         me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this, joystickRight));
         me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
@@ -61,12 +67,27 @@ export default class TankContainer extends me.Container {
             me.audio.seek("gun_battle_sound-ReamProductions", 0);
         }
 
+        if (me.input.isKeyPressed('shoot')) {
+            this.shoot();
+        }
 
+        if (me.input.isKeyPressed('genleft')) {
+            this.rotateGunKeyboard();
+
+        } else if (me.input.isKeyPressed('gunright')) {
+            this.rotateGunKeyboard();
+        }
+
+
+
+
+
+        // move
         this.pos.x += (this.speedx * Math.sin(this.angle));
         this.pos.y -= (this.speedy * Math.cos(this.angle));
 
 
-
+        // tracks
         if(this.isStarted &&
             (this.pos.y >= (this.prevTrackPos.y + 16)) || (this.pos.y <= (this.prevTrackPos.y - 16)) ||
             (this.pos.x >= (this.prevTrackPos.x + 16)) || (this.pos.x <= (this.prevTrackPos.x - 16))
@@ -287,6 +308,14 @@ export default class TankContainer extends me.Container {
         }, 100);
 
 
+    }
+
+    explode() {
+        const tank = this.getChildByName('TankEntity')[0];
+        const gun = this.getChildByName('GunEntity')[0];
+
+        tank.renderable.flicker(500);
+        gun.renderable.flicker(500);
     }
 
     startGun(joystickRight, e) {
@@ -614,7 +643,7 @@ class BulletEntity extends me.Entity {
         }
 
 
-        if (this.body.collisionType === me.collision.types.PLAYER_OBJECT) {
+        if (this.ancestor.body.collisionType === me.collision.types.PLAYER_OBJECT) {
             // shoot by player
             if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
                 console.log('colpito il nemico');
@@ -622,19 +651,21 @@ class BulletEntity extends me.Entity {
                 game.data.score += 10;
                 this.ancestor.removeChild(this);
 
-                other.flicker(100);
+                other.explode();
+
 
                 return true;
             }
 
-        } else if (this.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+        } else if (this.ancestor.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             // shoot by enemy
             if (other.body.collisionType === me.collision.types.PLAYER_OBJECT) {
                 console.log('colpito dal nemico');
 
                 this.ancestor.removeChild(this);
 
-                this.flicker(100);
+                other.explode();
+
 
                 // send multiplayer data
                 game.mp.hit = true;

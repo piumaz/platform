@@ -41,16 +41,15 @@ class Bootstrap {
         me.pool.register("EnemyContainer", EnemyContainer);
 
         me.pool.register("CoinEntity", CoinEntity);
-        // me.pool.register("EnemyEntity", game.EnemyEntity);
 
         // enable the keyboard
-        me.input.bindKey(me.input.KEY.LEFT, "left");
-        me.input.bindKey(me.input.KEY.RIGHT, "right");
-        me.input.bindKey(me.input.KEY.UP, "up");
-        me.input.bindKey(me.input.KEY.DOWN, "down");
+        // me.input.bindKey(me.input.KEY.LEFT, "left");
+        // me.input.bindKey(me.input.KEY.RIGHT, "right");
+        // me.input.bindKey(me.input.KEY.UP, "up");
+        // me.input.bindKey(me.input.KEY.DOWN, "down");
 
-        me.input.bindKey(me.input.KEY.Z, "z");
-        me.input.bindKey(me.input.KEY.X, "x");
+        me.input.bindKey(me.input.KEY.Z, "gunleft");
+        me.input.bindKey(me.input.KEY.X, "gunright");
 
         me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
 

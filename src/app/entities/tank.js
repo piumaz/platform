@@ -41,14 +41,15 @@ export default class TankContainer extends me.Container {
 
         me.event.subscribe("shoot", this.shoot.bind(this));
 
-        // me.input.registerPointerEvent('pointerdown', joystickLeft, this.start.bind(this));
-        // me.input.registerPointerEvent('pointermove', joystickLeft, this.move.bind(this));
-        // me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
+        me.input.registerPointerEvent('pointerdown',  joystickLeft, this.start.bind(this));
+        me.input.registerPointerEvent('pointermove',  joystickLeft, this.move.bind(this));
+        me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
+        me.input.registerPointerEvent('pointerup',    joystickLeft, this.stop.bind(this));
 
-        me.input.registerPointerEvent('pointerdown',    me.game.viewport, this.start.bind(this));
-        me.input.registerPointerEvent('pointermove',    me.game.viewport, this.move.bind(this));
-        me.input.registerPointerEvent('pointerleave',   me.game.viewport, this.stop.bind(this));
-        me.input.registerPointerEvent('pointerup',      me.game.viewport, this.stop.bind(this));
+        // me.input.registerPointerEvent('pointerdown',    me.game.viewport., this.start.bind(this));
+        // me.input.registerPointerEvent('pointermove',    me.game.viewport, this.move.bind(this));
+        // me.input.registerPointerEvent('pointerleave',   me.game.viewport, this.stop.bind(this));
+        // me.input.registerPointerEvent('pointerup',      me.game.viewport, this.stop.bind(this));
 
 
         me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this, joystickRight));
@@ -57,37 +58,8 @@ export default class TankContainer extends me.Container {
 
     }
 
-    update (dt) {
+    addTracks() {
 
-        if (me.audio.seek("tank") >= 2.38) {
-            me.audio.seek("tank", 1.2);
-        }
-
-        if (me.audio.seek("gun_battle_sound-ReamProductions") >= 20) {
-            me.audio.seek("gun_battle_sound-ReamProductions", 0);
-        }
-
-        if (me.input.isKeyPressed('shoot')) {
-            this.shoot();
-        }
-
-        if (me.input.isKeyPressed('genleft')) {
-            this.rotateGunKeyboard();
-
-        } else if (me.input.isKeyPressed('gunright')) {
-            this.rotateGunKeyboard();
-        }
-
-
-
-
-
-        // move
-        this.pos.x += (this.speedx * Math.sin(this.angle));
-        this.pos.y -= (this.speedy * Math.cos(this.angle));
-
-
-        // tracks
         if(this.isStarted &&
             (this.pos.y >= (this.prevTrackPos.y + 16)) || (this.pos.y <= (this.prevTrackPos.y - 16)) ||
             (this.pos.x >= (this.prevTrackPos.x + 16)) || (this.pos.x <= (this.prevTrackPos.x - 16))
@@ -113,6 +85,45 @@ export default class TankContainer extends me.Container {
             this.prevTrackPos = {x: this.pos.x, y: this.pos.y};
 
         }
+
+    }
+
+    update (dt) {
+
+        if (me.audio.seek("tank") >= 2.38) {
+            me.audio.seek("tank", 1.2);
+        }
+
+        if (me.audio.seek("gun_battle_sound-ReamProductions") >= 20) {
+            me.audio.seek("gun_battle_sound-ReamProductions", 0);
+        }
+
+        if (me.input.isKeyPressed('shoot')) {
+            this.shoot();
+        }
+
+        // gun keyboard movement
+        let moveAngle = 0;
+
+        if (me.input.isKeyPressed('gunleft')) {
+            moveAngle = -2;
+        }
+        else if (me.input.isKeyPressed('gunright')) {
+            moveAngle = 2;
+        }
+        const deg = moveAngle; // * Math.PI / 180;
+        this.angleGun += deg * Math.PI / 180;
+
+        this.getChildByName('GunEntity')[0].centerRotate(deg);
+
+
+        // move tank
+        this.pos.x += (this.speedx * Math.sin(this.angle));
+        this.pos.y -= (this.speedy * Math.cos(this.angle));
+
+
+        // add tracks
+        this.addTracks();
 
 
         // apply physics to the body (this moves the entity)

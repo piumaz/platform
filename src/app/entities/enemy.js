@@ -128,9 +128,11 @@ export default class EnemyContainer extends TankContainer {
         // this.pos.x += (speed * Math.sin(this.angle));
         // this.pos.y -= (speed * Math.cos(this.angle));
 
+        // add tracks
+        this.addTracks();
 
         // apply physics to the body (this moves the entity)
-        //this.body.update(dt);
+        this.body.update(dt);
 
         this.updateChildBounds();
 

@@ -52,7 +52,7 @@ export default class HUD extends me.Container {
         //JoystickRight.body.addShape(new me.Ellipse(this.width/2, this.height/2, this.width, this.height));
 
 
-        //this.addChild(JoystickLeft, 2);
+        this.addChild(JoystickLeft, 2);
         this.addChild(JoystickRight, 1);
 
         const shootSettings = {

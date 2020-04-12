@@ -75,11 +75,6 @@ const resources = [
         "src": "assets/img/sprite/air2.png"
     },
     {
-        "name": "barrelRed_outline",
-        "type": "image",
-        "src": "assets/img/sprite/barrelRed_outline.png"
-    },
-    {
         "name": "bullet",
         "type": "image",
         "src": "assets/img/sprite/bullet.png"
@@ -123,6 +118,21 @@ const resources = [
         "name": "tankRed_outline",
         "type": "image",
         "src": "assets/img/sprite/tankRed_outline.png"
+    },
+    {
+        "name": "barrelRed_outline",
+        "type": "image",
+        "src": "assets/img/sprite/barrelRed_outline.png"
+    },
+    {
+        "name": "tankBlack_outline",
+        "type": "image",
+        "src": "assets/img/sprite/tankBlack_outline.png"
+    },
+    {
+        "name": "barrelBlack_outline",
+        "type": "image",
+        "src": "assets/img/sprite/barrelBlack_outline.png"
     },
     {
         "name": "tracks",

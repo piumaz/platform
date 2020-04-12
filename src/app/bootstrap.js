@@ -1,3 +1,4 @@
+import 'core-js';
 import {me} from 'melonjs';
 
 import resources from './resources';

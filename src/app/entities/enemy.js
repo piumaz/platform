@@ -1,5 +1,7 @@
 import {me} from 'melonjs';
 import TankContainer from './tank';
+import game from "../game";
+import Mp from "../multiplayer";
 
 export default class EnemyContainer extends TankContainer {
 
@@ -21,37 +23,114 @@ export default class EnemyContainer extends TankContainer {
         me.input.bindKey(me.input.KEY.UP, "up");
         me.input.bindKey(me.input.KEY.DOWN, "down");
 
+
+    }
+
+    setData(data) {
+
+        // console.log('setData', data.gunDegrees, data.prevGunDegrees);
+
+        this.pos.x = data.x;
+        this.pos.y = data.y;
+        this.angle = data.angle;
+
+        this.angleGun = data.angleGun;
+
+
+        if (this.prevDegrees !== data.tankDegrees) {
+            const tank = this.getChildByName('TankEntity')[0];
+            tank.centerRotate( data.tankDegrees - this.prevDegrees );
+        }
+        this.prevDegrees = data.tankDegrees;
+
+
+        if (data.gunDegrees !== 0) {
+            const gun = this.getChildByName('GunEntity')[0];
+            gun.centerRotate(this.prevGunDegrees);
+            gun.centerRotate(data.gunDegrees);
+
+            this.prevGunDegrees = -data.gunDegrees;
+        }
+
+
+        if(data.hit) {
+            this.flicker(100);
+        }
+
+        if(data.shoot) {
+            this.shoot();
+        }
+    }
+
+    shoot() {
+
+        const gun = this.getChildByName('GunEntity')[0];
+
+        me.audio.play("shoot", false, null, 0.5);
+
+
+        this.addChild(me.pool.pull("FireEntity",
+            (this.width / 2) - 32,
+            -60,
+            {
+                name: 'FireEntity',
+                width: 64,
+                height: 64,
+                frameheight: 64,
+                framewidth: 64,
+                image: 'fire4',
+                anchorPoint: {x:0,y:0},
+                angle: this.angleGun || 0
+            }
+        ), 15);
+
+
+        this.addChild(me.pool.pull("BulletEntity",
+            (this.width / 2) - 6,
+            (this.height / 2) - 26,
+            {
+                name: 'BulletEntity',
+                width: 12,
+                height: 12,
+                frameheight: 26,
+                framewidth: 12,
+                image: 'bullet',
+                anchorPoint: {x:0,y:0},
+                angle: this.angleGun || 0
+            }
+        ), 15);
+
     }
 
     update(dt) {
 
 
-        let moveAngle = 0;
-
-        let speed = 0;
-
-        if (me.input.isKeyPressed('up')) {
-            speed = 1;
-        }
-        if (me.input.isKeyPressed('down')) {
-            speed = -1;
-        }
-        if (me.input.isKeyPressed('left')) {
-            moveAngle = -1;
-        }
-        if (me.input.isKeyPressed('right')) {
-            moveAngle = 1;
-        }
-
-        this.angle += moveAngle * Math.PI / 180;
-
-
-        this.pos.x += (speed * Math.sin(this.angle));
-        this.pos.y -= (speed * Math.cos(this.angle));
+        // let moveAngle = 0;
+        //
+        // let speed = 0;
+        //
+        // if (me.input.isKeyPressed('up')) {
+        //     speed = 1;
+        // }
+        // if (me.input.isKeyPressed('down')) {
+        //     speed = -1;
+        // }
+        // if (me.input.isKeyPressed('left')) {
+        //     moveAngle = -1;
+        // }
+        // if (me.input.isKeyPressed('right')) {
+        //     moveAngle = 1;
+        // }
+        //
+        // this.angle += moveAngle * Math.PI / 180;
+        //
+        //
+        // this.pos.x += (speed * Math.sin(this.angle));
+        // this.pos.y -= (speed * Math.cos(this.angle));
 
 
         // apply physics to the body (this moves the entity)
-        this.body.update(dt);
+        //this.body.update(dt);
 
         this.updateChildBounds();
 

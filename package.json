@@ -20,6 +20,8 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "colyseus.js": "^0.12.2",
+    "core-js": "^3.6.5",
     "melonjs": "^7.1.1"
   }
 }

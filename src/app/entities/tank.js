@@ -1,4 +1,6 @@
 import {me} from 'melonjs';
+import game from './../game';
+import Mp from "../multiplayer";
 
 /**
  * tank container
@@ -20,7 +22,14 @@ export default class TankContainer extends me.Container {
 
         // set the display to follow our position on both axis
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH, 0.4);
+
+        game.mp = {...game.mp, ...{
+            x: this.pos.x,
+            y: this.pos.y
+        }};
+
     }
+
 
     setUiInteraction() {
 
@@ -93,7 +102,13 @@ export default class TankContainer extends me.Container {
         // handle collisions against other shapes
         me.collision.check(this);
 
-        // game.sendData(this);
+        // send multiplayer data
+        game.mp = {...game.mp, ...{
+                x: this.pos.x,
+                y: this.pos.y,
+            }};
+        Mp.send({...game.mp});
+
 
         return this._super(me.Container, "update", [dt]);
 
@@ -113,19 +128,15 @@ export default class TankContainer extends me.Container {
                     return true;
                 }
 
-                return false;
                 break;
 
             case me.collision.types.ENEMY_OBJECT:
 
-                console.log('collision con enemy');
-
                 return true;
+
                 break;
 
             default:
-                //console.log(other);
-                // Do not respond to other objects (e.g. coins)
                 return false;
         }
 
@@ -133,9 +144,14 @@ export default class TankContainer extends me.Container {
     }
 
     onDestroyEvent () {
-        // remove the HUD from the game world
-        // this.removeChild( this.getChildByName('TankEntity') );
-        // this.removeChild( this.getChildByName('GunEntity') );
+
+        if ( this.getChildByName('TankEntity') ) {
+            this.removeChildNow( this.getChildByName('TankEntity') );
+        }
+
+        if ( this.getChildByName('GunEntity') ) {
+            this.removeChildNow( this.getChildByName('GunEntity') );
+        }
     }
 
     setBody() {
@@ -195,7 +211,7 @@ export default class TankContainer extends me.Container {
             height: 78,
             frameheight: 78,
             framewidth: 83,
-            image: 'tankRed_outline',
+            image: this.name == 'TankContainer' ? 'tankRed_outline' : 'tankBlack_outline',
             anchorPoint: {x:0,y:0},
         };
 
@@ -205,7 +221,7 @@ export default class TankContainer extends me.Container {
             y: -10,
             width: 24,
             height: 58,
-            image: 'barrelRed_outline',
+            image: this.name == 'TankContainer' ? 'barrelRed_outline' : 'barrelBlack_outline',
             anchorPoint: {x:0,y:0}
         };
 
@@ -262,6 +278,14 @@ export default class TankContainer extends me.Container {
             }
         ), 15);
 
+        // send multiplayer data
+        game.mp.shoot = true;
+        Mp.send({...game.mp});
+
+        setTimeout(() => {
+            game.mp.shoot = false;
+        }, 100);
+
 
     }
 
@@ -312,8 +336,23 @@ export default class TankContainer extends me.Container {
         gun.centerRotate(degrees);
 
 
+        game.mp = {...game.mp, ...{
+                angleGun: this.angleGun,
+                gunDegrees: degrees
+            }};
+
+        Mp.send({...game.mp});
+
+        setTimeout(() => {
+            game.mp.gunDegrees = 0;
+        }, 100);
+
+
         this.prevGunDegrees = -degrees;
         this.prevPosGun = e.pos;
+
+
+        // send multiplayer data
 
 
     }
@@ -372,16 +411,20 @@ export default class TankContainer extends me.Container {
 
         const tank = this.getChildByName('TankEntity')[0];
         tank.centerRotate(degrees - this.prevDegrees);
-        // this.centerRotate(degrees - this.prevDegrees);
 
         this.speedx = 2;
         this.speedy = 2;
 
         this.angle += (degrees - this.prevDegrees) * (Math.PI / 180);
 
+
+        game.mp = {...game.mp, ...{
+                angle: this.angle,
+                tankDegrees: degrees,
+            }};
+
+
         this.prevDegrees = degrees;
-
-
 
     }
 
@@ -399,7 +442,7 @@ class TankEntity extends me.Entity {
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
 
-        this.angle = 0;
+        //this.angle = 0;
 
         this.body.removeShapeAt(0);
 
@@ -432,7 +475,7 @@ class GunEntity extends me.Entity {
 
         this.body.removeShapeAt(0);
 
-        this.angle = 0;
+        //this.angle = 0;
 
 
     }
@@ -564,25 +607,48 @@ class BulletEntity extends me.Entity {
 
     onCollision (res, other) {
 
-
         if (other.body.collisionType === me.collision.types.WORLD_SHAPE) {
 
-            //this.ancestor.removeChild(this);
-            return false;
-        }
-
-        if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
-            console.log('colpito il nemico');
-
-
             this.ancestor.removeChild(this);
-
-            // me.game.world.removeChild(this);
-            // me.game.world.removeChild(other);
-            // game.playScreen.enemyManager.removeChild(other);
             return true;
         }
 
+
+        if (this.body.collisionType === me.collision.types.PLAYER_OBJECT) {
+            // shoot by player
+            if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+                console.log('colpito il nemico');
+
+                game.data.score += 10;
+                this.ancestor.removeChild(this);
+
+                other.flicker(100);
+
+                return true;
+            }
+
+        } else if (this.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+            // shoot by enemy
+            if (other.body.collisionType === me.collision.types.PLAYER_OBJECT) {
+                console.log('colpito dal nemico');
+
+                this.ancestor.removeChild(this);
+
+                this.flicker(100);
+
+                // send multiplayer data
+                game.mp.hit = true;
+                Mp.send({...game.mp});
+
+                setTimeout(() => {
+                    game.mp.hit = false;
+                }, 100);
+
+                return true;
+            }
+        }
+
+        game.mp.hit = false;
 
         return false;
     }

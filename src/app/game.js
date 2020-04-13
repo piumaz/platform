@@ -2,12 +2,11 @@
 class Game {
     constructor() {
         this.data = {
-            playername: null,
             score : 0,
         };
 
         this.mp = {
-            playername: this.data.playername,
+            playername: 'anonymous',
             x: 0,
             y: 0,
             angle: 0,

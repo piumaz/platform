@@ -32,3 +32,17 @@ body {
     image-rendering: pixelated;
     -ms-interpolation-mode: nearest-neighbor;
 }
+
+#wrapper {
+    position: relative;
+}
+
+#wrapper input {
+    width: 200px;
+    left: 50%;
+    top: 50%;
+    font-size: 1rem;
+    transform: translate(-50%, calc(-50% - 100px));
+    position: absolute;
+    z-index: 2;
+}

@@ -1,10 +1,10 @@
 {
-  "short_name": "CovidTank",
-  "name": "CovidTank",
+  "short_name": "Tank",
+  "name": "Tank",
   "orientation": "landscape",
   "developer": {
-    "name": "melonjs",
-    "url": "http://www.melonjs.org"
+    "name": "piumaz",
+    "url": "http://www.piumaz.it"
   },
   "start_url": "./index.html",
   "display": "fullscreen",

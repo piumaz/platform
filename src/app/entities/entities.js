@@ -23,7 +23,7 @@ export default class CoinEntity extends me.CollectableEntity {
         me.audio.play("cling");
 
         // give some score
-        game.data.score += 250;
+        game.data.score += 50;
 
         // make sure it cannot be collected "again"
         this.body.setCollisionMask(me.collision.types.NO_OBJECT);

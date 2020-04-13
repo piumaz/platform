@@ -5,12 +5,14 @@ import Mp from "../multiplayer";
 
 export default class EnemyContainer extends TankContainer {
 
-    init(x, y, w, h) {
+    init(x, y, playername, w, h) {
         // call the constructor
         this._super(me.Container, 'init', [x, y, w, h]);
 
         // give a name
         this.name = "EnemyContainer";
+
+        this.playername = playername;
 
         this.setVar();
         this.mount();
@@ -28,7 +30,19 @@ export default class EnemyContainer extends TankContainer {
 
     setData(data) {
 
-        // console.log('setData', data.gunDegrees, data.prevGunDegrees);
+        const pNameEntity = this.getChildByName('PlayerNameEntity')[0];
+
+        if (!pNameEntity) {
+            //player name
+            console.log('aggiungo il nome');
+            this.addChild(me.pool.pull("PlayerNameEntity", this.width, -10, data.playername), 20);
+        }
+
+
+
+
+
+
 
         this.pos.x = data.x;
         this.pos.y = data.y;

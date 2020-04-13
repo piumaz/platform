@@ -32,10 +32,10 @@ export default class HUD extends me.Container {
 
         const leftSettings = {
             name: 'JoystickLeft',
-            x: -40,
-            y: me.game.viewport.height - 220,
-            width: 260,
-            height: 260,
+            x: -90,
+            y: me.game.viewport.height - 270,
+            width: 360,
+            height: 360,
         };
 
         const rightSettings = {
@@ -223,3 +223,4 @@ class ScoreItem extends me.Renderable {
         this.font.draw (renderer, game.data.score, me.game.viewport.width + this.pos.x, this.pos.y);
     }
 }
+

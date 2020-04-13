@@ -1,4 +1,5 @@
 import 'core-js';
+import screenfull from 'screenfull';
 import {me} from 'melonjs';
 
 import resources from './resources';
@@ -9,6 +10,7 @@ import TankContainer from './entities/tank';
 import EnemyContainer from './entities/enemy';
 import CoinEntity from './entities/entities';
 
+import TitleScreen from './screens/title';
 import PlayScreen from './screens/play';
 
 class Bootstrap {
@@ -16,7 +18,7 @@ class Bootstrap {
     constructor() {
 
         // Initialize the video.
-        if (!me.video.init(1024, 768, {wrapper : "screen", scale : "auto", scaleMethod : "flex-width"})) {
+        if (!me.video.init(1024, 768, {wrapper : "screen", scale : "auto", scaleMethod : "fill-min"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -25,6 +27,14 @@ class Bootstrap {
             me.debug.renderHitBox = true;
         }
 
+/*        try {
+            if (screenfull.isEnabled) {
+                screenfull.request();
+            }
+        } catch(er) {
+            console.log(er);
+        }*/
+
         // Initialize the audio.
         me.audio.init("mp3,ogg");
 
@@ -32,40 +42,22 @@ class Bootstrap {
         me.loader.preload(resources, this.loaded.bind(this));
 
 
+
     }
 
     loaded() {
 
-        me.pool.register("HUD", HUD);
-        me.pool.register("TankContainer", TankContainer);
-        me.pool.register("EnemyContainer", EnemyContainer);
-
-        me.pool.register("CoinEntity", CoinEntity);
-
-        // enable the keyboard
-        // me.input.bindKey(me.input.KEY.LEFT, "left");
-        // me.input.bindKey(me.input.KEY.RIGHT, "right");
-        // me.input.bindKey(me.input.KEY.UP, "up");
-        // me.input.bindKey(me.input.KEY.DOWN, "down");
-
-        me.input.bindKey(me.input.KEY.Z, "gunleft");
-        me.input.bindKey(me.input.KEY.X, "gunright");
-
-        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
-
-
-
-        // set the "Play/Ingame" Screen Object
-        // me.state.set(me.state.MENU, new TitleScreen());
+        // set the title screen Object
+        me.state.set(me.state.MENU, new TitleScreen());
 
         // set the "Play/Ingame" Screen Object
         me.state.set(me.state.PLAY, new PlayScreen());
 
         // set a global fading transition for the screen
-        me.state.transition("fade", "#FFFFFF", 250);
+        me.state.transition("fade", "#000000", 250);
 
         // display the menu title
-        me.state.change(me.state.PLAY);
+        me.state.change(me.state.MENU);
 
     }
 
@@ -82,10 +74,19 @@ class Bootstrap {
             }, false);
 
             // Scroll away mobile GUI
-            (function () {
-                window.scrollTo(0, 1);
-                me.video.onresize(null);
-            }); //.defer();
+
+            window.addEventListener("load",function() {
+                setTimeout(function(){
+                    // This hides the address bar:
+                    window.scrollTo(0, 1);
+                    me.video.onresize(null);
+                }, 0);
+            });
+
+            // (function () {
+            //     window.scrollTo(0, 1);
+            //     me.video.onresize(null);
+            // }).defer();
 
             me.event.subscribe(me.event.WINDOW_ONRESIZE, function (e) {
                 window.scrollTo(0, 1);

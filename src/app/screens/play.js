@@ -1,6 +1,10 @@
 import {me} from 'melonjs';
 import game from './../game';
 import Mp from "../multiplayer";
+import HUD from "../entities/HUD";
+import TankContainer from "../entities/tank";
+import EnemyContainer from "../entities/enemy";
+import CoinEntity from "../entities/entities";
 
 export default class PlayScreen extends me.Stage {
     /**
@@ -9,6 +13,19 @@ export default class PlayScreen extends me.Stage {
     onResetEvent() {
 
         const players = {};
+
+        me.pool.register("HUD", HUD);
+        me.pool.register("TankContainer", TankContainer);
+        me.pool.register("EnemyContainer", EnemyContainer);
+
+        me.pool.register("CoinEntity", CoinEntity);
+
+        // enable the keyboard
+        me.input.bindKey(me.input.KEY.Z, "gunleft");
+        me.input.bindKey(me.input.KEY.X, "gunright");
+
+        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
+
 
 
         // load a level
@@ -24,7 +41,6 @@ export default class PlayScreen extends me.Stage {
         me.game.world.addChild(me.pool.pull("HUD", 0, 0));
 
 
-
         // join server
         Mp.join({
             width:  me.game.world.width,
@@ -36,14 +52,10 @@ export default class PlayScreen extends me.Stage {
                 //console.log(player.x , player.y);
 
                 if (Mp.sessionId() === sessionId) {
-                    players[sessionId] = me.game.world.addChild(me.pool.pull("TankContainer", player.x , player.y), 5);
-
-                    if (!game.data.playername) {
-                        game.data.playername = sessionId;
-                    }
+                    players[sessionId] = me.game.world.addChild(me.pool.pull("TankContainer", player.x, player.y, game.mp.playername), 5);
 
                 } else {
-                    players[sessionId] = me.game.world.addChild(me.pool.pull("EnemyContainer", player.x , player.y), 6);
+                    players[sessionId] = me.game.world.addChild(me.pool.pull("EnemyContainer", player.x, player.y, player.playername), 6);
                 }
 
             });

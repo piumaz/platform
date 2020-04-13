@@ -7,12 +7,14 @@ import Mp from "../multiplayer";
  */
 export default class TankContainer extends me.Container {
 
-    init(x, y, w, h) {
+    init(x, y, playername, w, h) {
         // call the constructor
         this._super(me.Container, 'init', [x, y, w, h]);
 
         // give a name
         this.name = "TankContainer";
+
+        this.playername = playername;
 
         this.setVar();
         this.mount();
@@ -23,9 +25,13 @@ export default class TankContainer extends me.Container {
         // set the display to follow our position on both axis
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH, 0.4);
 
+        //player name
+        this.addChild(me.pool.pull("PlayerNameEntity", this.width, -10, this.playername), 20);
+
         game.mp = {...game.mp, ...{
             x: this.pos.x,
-            y: this.pos.y
+            y: this.pos.y,
+            playername: this.playername
         }};
 
     }
@@ -233,7 +239,7 @@ export default class TankContainer extends me.Container {
         me.pool.register("BulletEntity", BulletEntity);
         me.pool.register("FireEntity", FireEntity);
         me.pool.register("TracksEntity", TracksEntity);
-
+        me.pool.register("PlayerNameEntity", PlayerNameEntity);
 
         const tankSettings = {
             name: 'TankEntity',
@@ -259,7 +265,6 @@ export default class TankContainer extends me.Container {
 
         this.addChild(me.pool.pull("TankEntity", tankSettings.x, tankSettings.y, tankSettings), 10);
         this.addChild(me.pool.pull("GunEntity", gunSettings.x, gunSettings.y, gunSettings), 20);
-
 
         this.width = tankSettings.width;
         this.height = tankSettings.height;
@@ -587,7 +592,9 @@ class FireEntity extends me.Entity {
 
 
         me.timer.setTimeout(() => {
-            this.ancestor.removeChild(this);
+            if(this.ancestor) {
+                this.ancestor.removeChild(this);
+            }
         }, 100);
 
     }
@@ -639,7 +646,9 @@ class BulletEntity extends me.Entity {
             this.pos.y < (this.startPos.y - this.body.maxVel.y)
         ) {
             //console.log('remove bullet');
-            this.ancestor.removeChild(this);
+            if(this.ancestor) {
+                this.ancestor.removeChild(this);
+            }
         }
 
         //return true;
@@ -649,7 +658,10 @@ class BulletEntity extends me.Entity {
 
         if (other.body.collisionType === me.collision.types.WORLD_SHAPE) {
 
-            this.ancestor.removeChild(this);
+            if(this.ancestor) {
+                this.ancestor.removeChild(this);
+            }
+
             return true;
         }
 
@@ -660,7 +672,10 @@ class BulletEntity extends me.Entity {
                 console.log('colpito il nemico');
 
                 game.data.score += 10;
-                this.ancestor.removeChild(this);
+
+                if(this.ancestor) {
+                    this.ancestor.removeChild(this);
+                }
 
                 other.explode();
 
@@ -673,7 +688,9 @@ class BulletEntity extends me.Entity {
             if (other.body.collisionType === me.collision.types.PLAYER_OBJECT) {
                 console.log('colpito dal nemico');
 
-                this.ancestor.removeChild(this);
+                if(this.ancestor) {
+                    this.ancestor.removeChild(this);
+                }
 
                 other.explode();
 
@@ -695,4 +712,44 @@ class BulletEntity extends me.Entity {
         return false;
     }
 
+}
+
+class PlayerNameEntity extends me.Renderable {
+    /**
+     * constructor
+     */
+    init(x, y, playername) {
+        // call the parent constructor
+        // (size does not matter here)
+        this._super(me.Renderable, 'init', [x, y, 0, 0]);
+
+        this.name = 'PlayerNameEntity';
+        this.playername = playername;
+
+        // create the font object
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+
+        // font alignment to right, bottom
+        this.font.textAlign = "left";
+        this.font.textBaseline = "top";
+        this.font.alpha = 0.5;
+
+    }
+
+    /**
+     * update function
+     */
+    update(dt) {
+
+        return true;
+    }
+
+    /**
+     * draw the player name
+     */
+    draw(renderer) {
+        // this.pos.x, this.pos.y are the relative position from the screen right bottom
+        this.font.draw(renderer, this.playername, this.pos.x, this.pos.y);
+        this.font.resize(0.75);
+    }
 }

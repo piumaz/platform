@@ -52,7 +52,7 @@ const resources = [
     {
         "name": "title_screen",
         "type": "image",
-        "src": "assets/img/gui/title_screen.png"
+        "src": "assets/img/gui/title_screen.jpeg"
     },
     {
         "name": "sheet_tanks",
@@ -140,6 +140,11 @@ const resources = [
         "src": "assets/img/sprite/tracks.png"
     },
     {
+        "name": "start",
+        "type": "image",
+        "src": "assets/img/ui/start.png"
+    },
+    {
         "name": "bottom",
         "type": "image",
         "src": "assets/img/ui/bottom.png"
@@ -148,11 +153,6 @@ const resources = [
         "name": "gun-control",
         "type": "image",
         "src": "assets/img/ui/gun-control.png"
-    },
-    {
-        "name": "shoot-contro",
-        "type": "image",
-        "src": "assets/img/ui/shoot-contro.png"
     },
     {
         "name": "shoot-control",

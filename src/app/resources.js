@@ -1,10 +1,5 @@
 const resources = [
     {
-        "name": "2_Minute_Thunderstorm-Mike_Koenig",
-        "type": "audio",
-        "src": "assets/bgm/"
-    },
-    {
         "name": "gun_battle_sound-ReamProductions",
         "type": "audio",
         "src": "assets/bgm/"
@@ -20,22 +15,12 @@ const resources = [
         "src": "assets/sfx/"
     },
     {
-        "name": "jump",
-        "type": "audio",
-        "src": "assets/sfx/"
-    },
-    {
         "name": "shoot",
         "type": "audio",
         "src": "assets/sfx/"
     },
     {
         "name": "shoot2",
-        "type": "audio",
-        "src": "assets/sfx/"
-    },
-    {
-        "name": "stomp",
         "type": "audio",
         "src": "assets/sfx/"
     },
@@ -150,19 +135,14 @@ const resources = [
         "src": "assets/img/ui/bottom.png"
     },
     {
-        "name": "gun-control",
+        "name": "shoot",
         "type": "image",
-        "src": "assets/img/ui/gun-control.png"
+        "src": "assets/img/ui/shoot.png"
     },
     {
-        "name": "shoot-control",
+        "name": "leftgun",
         "type": "image",
-        "src": "assets/img/ui/shoot-control.png"
-    },
-    {
-        "name": "tank-control",
-        "type": "image",
-        "src": "assets/img/ui/tank-control.png"
+        "src": "assets/img/ui/leftgun.png"
     },
     {
         "name": "top",

@@ -23,7 +23,13 @@ export default class TitleScreen extends me.Stage {
         me.game.world.addChild(backgroundImage, 1);
 
 
-        me.game.world.addChild( new TextInput((me.game.viewport.width / 2), me.game.viewport.height / 2, 'text', 30) );
+        me.game.world.addChild( new TextInput((me.game.viewport.width / 2), (me.game.viewport.height / 2), {
+            type: 'text',
+            id: 'playername',
+            placeholder: 'Insert your name...',
+            maxlength: 20,
+            pattern: '[a-zA-Z0-9_\-]+'
+        }));
 
 
 
@@ -35,19 +41,15 @@ export default class TitleScreen extends me.Stage {
             image: 'start',
         }));
 
-        // change to play state on press Enter or click/tap
-        me.input.bindKey(me.input.KEY.ENTER, "enter", true);
-        me.input.bindPointer(me.input.pointer.LEFT, me.input.KEY.ENTER);
-        this.handler = me.event.subscribe(me.event.KEYDOWN, function (action, keyCode, edge) {
-            if (action === "enter") {
-                // play something on tap / enter
-                // this will unlock audio on mobile devices
 
-                game.mp.playername = document.getElementById('playername').value;
-                me.audio.play("cling");
-                me.state.change(me.state.PLAY);
-            }
-        });
+        this.subResize = (e) => {
+            console.log('change rotation title');
+            this.onDestroyEvent();
+            this.reset();
+
+        }
+
+        me.event.subscribe(me.event.VIEWPORT_ONRESIZE, this.subResize);
 
     }
 
@@ -55,10 +57,11 @@ export default class TitleScreen extends me.Stage {
      * action to perform when leaving this screen (state change)
      */
     onDestroyEvent() {
+        console.log('destroy');
+        me.event.unsubscribe(me.event.VIEWPORT_ONRESIZE, this.subResize);
 
-        me.input.unbindKey(me.input.KEY.ENTER);
-        me.input.unbindPointer(me.input.pointer.LEFT);
-        me.event.unsubscribe(this.handler);
+        //me.input.unbindKey(me.input.KEY.ENTER);
+        //me.input.unbindPointer(me.input.pointer.LEFT);
 
     }
 }
@@ -77,27 +80,11 @@ class UiButtonEnter extends me.GUI_Object {
     // output something in the console
     // when the object is clicked
     onClick(event) {
-        me.event.publish("shoot");
-        // don't propagate the event
-        return false;
-    }
-}
 
-class ButtonEnter extends me.GUI_Object {
-    /**
-     * constructor
-     */
-    init(x, y, settings) {
+        game.mp.playername = document.getElementById('playername').value || 'anonymous';
+        me.audio.play("cling");
+        me.state.change(me.state.PLAY);
 
-        // call the constructor
-        this._super(me.GUI_Object, 'init', [x, y, settings]);
-
-    }
-
-    // output something in the console
-    // when the object is clicked
-    onClick(event) {
-        me.event.publish("shoot");
         // don't propagate the event
         return false;
     }

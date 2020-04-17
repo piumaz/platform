@@ -4,18 +4,14 @@ import {me} from 'melonjs';
 
 import resources from './resources';
 
-import HUD from './entities/HUD';
-
-import TankContainer from './entities/tank';
-import EnemyContainer from './entities/enemy';
-import CoinEntity from './entities/entities';
-
 import TitleScreen from './screens/title';
 import PlayScreen from './screens/play';
+
 
 class Bootstrap {
 
     constructor() {
+
 
         // Initialize the video.
         if (!me.video.init(1024, 768, {wrapper : "screen", scale : "auto", scaleMethod : "fill-min"})) {

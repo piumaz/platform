@@ -20,13 +20,6 @@ export default class PlayScreen extends me.Stage {
 
         me.pool.register("CoinEntity", CoinEntity);
 
-        // enable the keyboard
-        me.input.bindKey(me.input.KEY.Z, "gunleft");
-        me.input.bindKey(me.input.KEY.X, "gunright");
-
-        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
-
-
 
         // load a level
         me.levelDirector.loadLevel("area01");
@@ -52,10 +45,10 @@ export default class PlayScreen extends me.Stage {
                 //console.log(player.x , player.y);
 
                 if (Mp.sessionId() === sessionId) {
-                    players[sessionId] = me.game.world.addChild(me.pool.pull("TankContainer", player.x, player.y, game.mp.playername), 5);
+                    players[sessionId] = me.game.world.addChild(me.pool.pull("TankContainer", player.x, player.y, game.mp.playername, 83, 78), 5);
 
                 } else {
-                    players[sessionId] = me.game.world.addChild(me.pool.pull("EnemyContainer", player.x, player.y, player.playername), 6);
+                    players[sessionId] = me.game.world.addChild(me.pool.pull("EnemyContainer", player.x, player.y, player.playername, 83, 78), 5);
                 }
 
             });
@@ -83,7 +76,16 @@ export default class PlayScreen extends me.Stage {
         });
 
 
+        me.event.subscribe(me.event.VIEWPORT_ONRESIZE, (e) => {
+            console.log('change rotation', me.game.viewport.width, me.game.viewport.height);
 
+            me.game.world.getChildByName('HUD')[0].width = me.game.viewport.width;
+            me.game.world.getChildByName('HUD')[0].height = me.game.viewport.height;
+
+
+            me.game.world.getChildByName('HUD')[0].repositionChild();
+
+        });
     }
 
     /**
@@ -91,11 +93,9 @@ export default class PlayScreen extends me.Stage {
      */
     onDestroyEvent() {
 
-        me.game.world.removeChild( me.game.world.getChildByName('HUD') );
-        me.game.world.removeChild( me.game.world.getChildByName('TankEntity') );
-        me.game.world.removeChild( me.game.world.getChildByName('EnemyEntity') );
-        // remove the HUD from the game world
-        //me.game.world.removeChild(this.Tank);
+        me.game.world.removeChildNow( me.game.world.getChildByName('HUD') );
+        me.game.world.removeChildNow( me.game.world.getChildByName('TankEntity') );
+        me.game.world.removeChildNow( me.game.world.getChildByName('EnemyEntity') );
 
         // stop the current audio track
         me.audio.stopTrack();

@@ -8,6 +8,10 @@ import Mp from "../multiplayer";
 export default class TankContainer extends me.Container {
 
     init(x, y, playername, w, h) {
+
+        // w = 83;
+        // h = 78;
+
         // call the constructor
         this._super(me.Container, 'init', [x, y, w, h]);
 
@@ -15,6 +19,7 @@ export default class TankContainer extends me.Container {
         this.name = "TankContainer";
 
         this.playername = playername;
+
 
         this.setVar();
         this.mount();
@@ -27,6 +32,8 @@ export default class TankContainer extends me.Container {
 
         //player name
         this.addChild(me.pool.pull("PlayerNameEntity", this.width, -10, this.playername), 20);
+
+        //this.tint = new me.Color(128, 128, 128);
 
         game.mp = {...game.mp, ...{
             x: this.pos.x,
@@ -42,33 +49,50 @@ export default class TankContainer extends me.Container {
         const HUD = me.game.world.getChildByName('HUD')[0];
 
         const joystickLeft = HUD.getChildByName('JoystickLeft')[0];
-        const joystickRight = HUD.getChildByName('JoystickRight')[0];
-        const shootButton = HUD.getChildByName('ShootEntity')[0];
+        if (joystickLeft) {
+            me.input.registerPointerEvent('pointerdown',  joystickLeft, this.start.bind(this));
+            me.input.registerPointerEvent('pointermove',  joystickLeft, this.move.bind(this));
+            me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
+            me.input.registerPointerEvent('pointerup',    joystickLeft, this.stop.bind(this));
+        }
 
-        me.event.subscribe("shoot", this.shoot.bind(this));
+        //const joystickRight = HUD.getChildByName('JoystickRight')[0];
+        // if (joystickRight) {
+        //     me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this, joystickRight));
+        //     me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
+        //     me.input.registerPointerEvent('pointerleave', joystickRight, this.stopGun.bind(this));
+        // }
 
-        me.input.registerPointerEvent('pointerdown',  joystickLeft, this.start.bind(this));
-        me.input.registerPointerEvent('pointermove',  joystickLeft, this.move.bind(this));
-        me.input.registerPointerEvent('pointerleave', joystickLeft, this.stop.bind(this));
-        me.input.registerPointerEvent('pointerup',    joystickLeft, this.stop.bind(this));
+        //me.event.subscribe("shoot", this.shoot.bind(this));
 
-        // me.input.registerPointerEvent('pointerdown',    me.game.viewport., this.start.bind(this));
-        // me.input.registerPointerEvent('pointermove',    me.game.viewport, this.move.bind(this));
-        // me.input.registerPointerEvent('pointerleave',   me.game.viewport, this.stop.bind(this));
-        // me.input.registerPointerEvent('pointerup',      me.game.viewport, this.stop.bind(this));
+        if(me.device.isMobile) {
+            const shootButton = HUD.getChildByName('ShootEntity')[0];
+            const leftButton = HUD.getChildByName('LeftGunEntity')[0];
+            const rightButton = HUD.getChildByName('RightGunEntity')[0];
 
+            me.input.registerPointerEvent('pointerdown', shootButton, this.shoot.bind(this));
 
-        me.input.registerPointerEvent('pointerdown', joystickRight, this.startGun.bind(this, joystickRight));
-        me.input.registerPointerEvent('pointermove', joystickRight, this.rotateGun.bind(this));
-        me.input.registerPointerEvent('pointerleave', joystickRight, this.stopGun.bind(this));
+            me.input.registerPointerEvent('pointerdown', leftButton, this.rotateGunLeft.bind(this));
+            me.input.registerPointerEvent('pointerup', leftButton, this.stopGun.bind(this));
+            me.input.registerPointerEvent('pointerdown', rightButton, this.rotateGunRight.bind(this));
+            me.input.registerPointerEvent('pointerup', rightButton, this.stopGun.bind(this));
+        }
+
+        // me.event.subscribe("gunleft", this.rotateGunLeft.bind(this));
+        // me.event.subscribe("gunright", this.rotateGunRight.bind(this));
+
+        // enable the keyboard
+        me.input.bindKey(me.input.KEY.Z, "gunleft");
+        me.input.bindKey(me.input.KEY.X, "gunright");
+        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
 
     }
 
     addTracks() {
 
         if(this.isStarted &&
-            (this.pos.y >= (this.prevTrackPos.y + 16)) || (this.pos.y <= (this.prevTrackPos.y - 16)) ||
-            (this.pos.x >= (this.prevTrackPos.x + 16)) || (this.pos.x <= (this.prevTrackPos.x - 16))
+            (this.pos.y >= (this.prevTrackPos.y + 16)) || (this.pos.y < (this.prevTrackPos.y - 16)) ||
+            (this.pos.x >= (this.prevTrackPos.x + 16)) || (this.pos.x < (this.prevTrackPos.x - 16))
         ) {
 
             const track = me.pool.pull("TracksEntity",
@@ -111,16 +135,27 @@ export default class TankContainer extends me.Container {
         // gun keyboard movement
         let moveAngle = 0;
 
+        if (this.isGunMoved !== 0) {
+            moveAngle = this.isGunMoved;
+        }
+
         if (me.input.isKeyPressed('gunleft')) {
             moveAngle = -2;
         }
         else if (me.input.isKeyPressed('gunright')) {
             moveAngle = 2;
         }
-        const deg = moveAngle; // * Math.PI / 180;
-        this.angleGun += deg * Math.PI / 180;
+        if (moveAngle !== 0) {
 
-        this.getChildByName('GunEntity')[0].centerRotate(deg);
+            const deg = moveAngle;
+            this.angleGun += deg * Math.PI / 180;
+
+            this.getChildByName('GunEntity')[0].centerRotate(deg);
+
+            game.mp.angleGun = this.angleGun;
+            game.mp.gunDegrees += deg;
+        }
+
 
 
         // move tank
@@ -161,11 +196,11 @@ export default class TankContainer extends me.Container {
 
             case me.collision.types.WORLD_SHAPE:
 
-                if (other.type === "tree" || other.type === "rock") {
+/*                if (other.type === "tree" || other.type === "rock" || other.type === "border") {
 
                     return true;
-                }
-
+                }*/
+                return true;
                 break;
 
             case me.collision.types.ENEMY_OBJECT:
@@ -230,6 +265,7 @@ export default class TankContainer extends me.Container {
         this.anchorPoint.x = 0;
         this.anchorPoint.y = 0;
 
+        this.isGunMoved = 0;
     }
 
     mount() {
@@ -266,15 +302,15 @@ export default class TankContainer extends me.Container {
         this.addChild(me.pool.pull("TankEntity", tankSettings.x, tankSettings.y, tankSettings), 10);
         this.addChild(me.pool.pull("GunEntity", gunSettings.x, gunSettings.y, gunSettings), 20);
 
-        this.width = tankSettings.width;
-        this.height = tankSettings.height;
+        // this.width = tankSettings.width;
+        // this.height = tankSettings.height;
 
         this.updateChildBounds();
     }
 
     shoot() {
 
-        if ( this.getChildByName('BulletEntity').length > 1) {
+        if ( me.game.world.getChildByName('BulletEntity').length > 0) {
             return;
         }
 
@@ -300,9 +336,9 @@ export default class TankContainer extends me.Container {
         ), 15);
 
 
-        this.addChild(me.pool.pull("BulletEntity",
-            (this.width / 2) - 6,
-            (this.height / 2) - 26,
+        me.game.world.addChild(me.pool.pull("BulletEntity",
+            this.pos.x + (this.width / 2) - 6,
+            this.pos.y + (this.height / 2) - 26,
             {
                 name: 'BulletEntity',
                 width: 12,
@@ -311,9 +347,10 @@ export default class TankContainer extends me.Container {
                 framewidth: 12,
                 image: 'bullet',
                 anchorPoint: {x:0,y:0},
-                angle: this.angleGun || 0
+                angle: this.angleGun || 0,
+                shootedBy: this.body.collisionType
             }
-        ), 15);
+        ), 4);
 
         // send multiplayer data
         game.mp.shoot = true;
@@ -327,13 +364,43 @@ export default class TankContainer extends me.Container {
     }
 
     explode() {
+
+        this.stop(null);
+        me.device.vibrate(1000);
+
         const tank = this.getChildByName('TankEntity')[0];
         const gun = this.getChildByName('GunEntity')[0];
 
         tank.renderable.flicker(500);
-        gun.renderable.flicker(500);
+        gun.renderable.flicker(500, () => {
+
+            if (this.name == 'TankContainer') {
+                this.respawn();
+            }
+
+
+        });
+
+
     }
 
+    respawn() {
+
+        me.audio.play("cling");
+
+        this.pos.x =  Math.random() * (me.game.world.width - 300) + 300;
+        this.pos.y = Math.random() * (me.game.world.height - 300) + 300;
+
+        // send multiplayer data
+        game.mp = {...game.mp, ...{
+                x: this.pos.x,
+                y: this.pos.y,
+            }};
+        Mp.send({...game.mp});
+
+    }
+
+/*
     startGun(joystickRight, e) {
 
         me.audio.playTrack("gun", 0.4);
@@ -381,10 +448,8 @@ export default class TankContainer extends me.Container {
         gun.centerRotate(degrees);
 
 
-        game.mp = {...game.mp, ...{
-                angleGun: this.angleGun,
-                gunDegrees: degrees
-            }};
+        game.mp.angleGun = this.angleGun;
+        game.mp.gunDegrees = degrees;
 
         Mp.send({...game.mp});
 
@@ -396,9 +461,24 @@ export default class TankContainer extends me.Container {
         this.prevGunDegrees = -degrees;
         this.prevPosGun = e.pos;
 
+    }
+*/
 
-        // send multiplayer data
+    stopGun(e) {
 
+        this.isGunMoved = 0;
+
+    }
+
+    rotateGunLeft() {
+
+        this.isGunMoved = -2;
+
+    }
+
+    rotateGunRight() {
+
+        this.isGunMoved = 2;
 
     }
 
@@ -452,26 +532,53 @@ export default class TankContainer extends me.Container {
             degrees += 360;
         }
 
-        //console.log('degree', (degrees - this.prevDegrees));
 
-        const tank = this.getChildByName('TankEntity')[0];
-        tank.centerRotate(degrees - this.prevDegrees);
 
-        this.speedx = 2;
-        this.speedy = 2;
 
-        this.angle += (degrees - this.prevDegrees) * (Math.PI / 180);
+        if (this.speedx == 0) {
+            this.speedx = 2;
+            this.speedy = 2;
+        }
+
+        //console.log('degree', Math.floor(degrees));
+
+        if ((degrees - this.prevDegrees) > 120 && (degrees - this.prevDegrees) < 240) {
+            this.speedx = -2;
+            this.speedy = -2;
+
+            //console.log('inversione');
+        } else {
+            const tank = this.getChildByName('TankEntity')[0];
+            tank.centerRotate(degrees - this.prevDegrees);
+
+            const gun = this.getChildByName('GunEntity')[0];
+            gun.centerRotate(degrees - this.prevDegrees);
+
+            this.angle += (degrees - this.prevDegrees) * (Math.PI / 180);
+            this.angleGun += (degrees - this.prevDegrees) * (Math.PI / 180);
+
+            this.prevDegrees = degrees;
+        }
+
 
 
         game.mp = {...game.mp, ...{
                 angle: this.angle,
+                angleGun: this.angleGun,
                 tankDegrees: degrees,
             }};
 
 
-        this.prevDegrees = degrees;
+
 
     }
+
+    // centerRotate (deg) {
+    //     this
+    //         .translate((this.pos.x + this.width) / 2, (this.pos.y + this.width) / 2)
+    //         .rotate(deg * Math.PI / 180)
+    //         .translate(-(this.pos.x + this.width) / 2, -(this.pos.y + this.width) / 2);
+    // }
 
 }
 
@@ -492,7 +599,6 @@ class TankEntity extends me.Entity {
         this.body.removeShapeAt(0);
 
         this.renderable.flipY(true).flipX(true);
-
 
     }
 
@@ -545,7 +651,7 @@ class TracksEntity extends me.Entity {
         this._super(me.Entity, 'init', [x, y, settings]);
 
         this.body.removeShapeAt(0);
-
+        this.body.collisionType = me.collision.types.NO_OBJECT;
         this.renderable.currentTransform
             .translate((this.renderable.width) / 2, (this.renderable.height -83) / 2  )
             .rotate(settings.angle)
@@ -612,7 +718,7 @@ class BulletEntity extends me.Entity {
 
         this._super(me.Entity, "init", [x, y, settings]);
 
-        this.config = settings;
+        this.settings = settings;
 
         this.startPos = {x: x, y: y};
 
@@ -624,7 +730,7 @@ class BulletEntity extends me.Entity {
 
         this.renderable.currentTransform
             .translate((this.renderable.width) / 2, (this.renderable.height) )
-            .rotate(this.config.angle)
+            .rotate(this.settings.angle)
             .translate(-(this.renderable.width) / 2, -(this.renderable.height) );
 
         this.alwaysUpdate = true;
@@ -632,8 +738,8 @@ class BulletEntity extends me.Entity {
 
     update (time) {
 
-        this.body.vel.x += this.body.accel.x * time / 1000 * (Math.sin(this.config.angle));
-        this.body.vel.y -= this.body.accel.y * time / 1000 * (Math.cos(this.config.angle));
+        this.body.vel.x += this.body.accel.x * time / 1000 * (Math.sin(this.settings.angle));
+        this.body.vel.y -= this.body.accel.y * time / 1000 * (Math.cos(this.settings.angle));
 
         this.body.update();
 
@@ -654,18 +760,61 @@ class BulletEntity extends me.Entity {
         //return true;
     }
 
-    onCollision (res, other) {
+    onCollision (response, other) {
 
-        if (other.body.collisionType === me.collision.types.WORLD_SHAPE) {
+        // console.log(response.b.body.collisionType, other);
+        if (response.b.body.collisionType === me.collision.types.WORLD_SHAPE) {
 
             if(this.ancestor) {
                 this.ancestor.removeChild(this);
             }
 
             return true;
+
+        }
+
+        if (this.settings.shootedBy === me.collision.types.PLAYER_OBJECT && response.b.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+
+            console.log('colpito il nemico');
+
+            game.data.score += 10;
+
+            if(this.ancestor) {
+                this.ancestor.removeChild(this);
+            }
+
+            other.explode();
+
+
+            return true;
+
+        }
+
+        if (this.settings.shootedBy === me.collision.types.ENEMY_OBJECT && response.b.body.collisionType === me.collision.types.PLAYER_OBJECT) {
+
+            console.log('colpito dal nemico');
+
+            if(this.ancestor) {
+                this.ancestor.removeChild(this);
+            }
+
+            other.explode();
+
+
+            // send multiplayer data
+            game.mp.hit = true;
+            Mp.send({...game.mp});
+
+            setTimeout(() => {
+                game.mp.hit = false;
+            }, 100);
+
+            return true;
+
         }
 
 
+/*
         if (this.ancestor.body.collisionType === me.collision.types.PLAYER_OBJECT) {
             // shoot by player
             if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
@@ -705,7 +854,7 @@ class BulletEntity extends me.Entity {
 
                 return true;
             }
-        }
+        }*/
 
         game.mp.hit = false;
 

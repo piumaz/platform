@@ -40,32 +40,28 @@ export default class EnemyContainer extends TankContainer {
 
 
 
-
-
-
-
         this.pos.x = data.x;
         this.pos.y = data.y;
         this.angle = data.angle;
 
         this.angleGun = data.angleGun;
 
+        const tank = this.getChildByName('TankEntity')[0];
+        const gun = this.getChildByName('GunEntity')[0];
 
         if (this.prevDegrees !== data.tankDegrees) {
-            const tank = this.getChildByName('TankEntity')[0];
             tank.centerRotate( data.tankDegrees - this.prevDegrees );
+            gun.centerRotate( data.tankDegrees - this.prevDegrees );
         }
         this.prevDegrees = data.tankDegrees;
 
 
         if (data.gunDegrees !== 0) {
-            const gun = this.getChildByName('GunEntity')[0];
             gun.centerRotate(this.prevGunDegrees);
             gun.centerRotate(data.gunDegrees);
 
             this.prevGunDegrees = -data.gunDegrees;
         }
-
 
         if(data.hit) {
             this.explode();

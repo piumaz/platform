@@ -5,28 +5,23 @@ import {me} from 'melonjs';
  */
 export default class Textinput extends me.Renderable {
 
-    init(x, y, type, length) {
+    init(x, y, settings) {
 
-        console.log(x,y);
         this._super(me.Renderable, 'init', [x, y, 0, 0]);
 
         this.input = document.createElement("INPUT");
-        this.input.setAttribute("type", type);
-        this.input.setAttribute("id", 'playername');
-        console.log(x, y);
-        //this.input.setAttribute("style", `left: ${x}px; top: ${y}px`);
+        this.input.setAttribute("type", settings.type);
 
-
-        switch (type) {
-            case "text":
-                this.input.setAttribute("maxlength", length);
-                this.input.setAttribute("pattern", "[a-zA-Z0-9_\-]+");
-                break;
-            case "number":
-                this.input.setAttribute("max", length);
-                break;
+        for (let attr in settings) {
+            this.input.setAttribute(attr, settings[attr]);
         }
 
+        try {
+            document.getElementById(settings.id).remove();
+        } catch (e) {
+            
+        }
+        
         document.getElementById("wrapper").appendChild(this.input);
 
     }
